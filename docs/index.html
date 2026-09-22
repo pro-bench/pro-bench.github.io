@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Pro-Bench: Prompt-Robust Open-Vocabulary Visual Grounding</title>
+<meta name="description" content="Pro-Bench tests whether open-vocabulary models find the same target however an operator phrases the request: 13k+ real robot frames, 74.5k instances, 515 queries, 16 models.">
+<meta property="og:title" content="Pro-Bench: Prompt-Robust Open-Vocabulary Visual Grounding">
+<meta property="og:description" content="Same target, three phrasings, sixteen models. A benchmark for prompt robustness in real robot deployments.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="assets/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect width='16' height='16' rx='3' fill='%2316202A'/%3E%3Crect x='3' y='4' width='10' height='8' fill='none' stroke='%23F2C200' stroke-width='2'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#E9EDEB; --surface:#F7F8F6; --raised:#FFFFFF;
+  --ink:#16202A; --ink-2:#46525E; --ink-3:#6E7984; --rule:#C8CFCD; --rule-2:#DCE1DF;
+  --band:#16202A; --band-ink:#EEF2F0; --band-2:#A9B4BD;
+  --hivis:#F2C200; --hivis-deep:#D9AD00;
+  --f-orig:#2C49B4; --f-cat:#0B7A83; --f-tmpl:#B81F6E;
+  --d-orig:#7EA2FF; --d-cat:#35D8D2; --d-tmpl:#FF62B4;
+  --sans:"Barlow","Segoe UI",system-ui,-apple-system,sans-serif;
+  --cond:"Barlow Condensed","Arial Narrow","Barlow",system-ui,sans-serif;
+  --mono:ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --wrap:1180px; --r:8px;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#131B22; --surface:#18222B; --raised:#1D2833;
+    --ink:#E6ECEA; --ink-2:#B4BFC7; --ink-3:#8C98A2; --rule:#33414D; --rule-2:#27333E;
+    --band:#0E151B; --f-orig:#8AA8FF; --f-cat:#3FCFD0; --f-tmpl:#FF74BC;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#131B22; --surface:#18222B; --raised:#1D2833;
+  --ink:#E6ECEA; --ink-2:#B4BFC7; --ink-3:#8C98A2; --rule:#33414D; --rule-2:#27333E;
+  --band:#0E151B; --f-orig:#8AA8FF; --f-cat:#3FCFD0; --f-tmpl:#FF74BC;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:calc(64px + env(safe-area-inset-top,0px));scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--sans);-webkit-font-smoothing:antialiased;
+  font-variant-numeric:tabular-nums}
+img{max-width:100%;display:block}
+a{color:var(--f-orig);text-underline-offset:3px}
+:focus-visible{outline:3px solid var(--hivis);outline-offset:2px}
+.wrap{max-width:var(--wrap);margin:0 auto;padding:0 28px}
+h1,h2,h3{margin:0;line-height:1.15}
+h2{font:700 40px/1.05 var(--cond);letter-spacing:-.005em;margin-bottom:14px}
+h3{font-size:19px;font-weight:600}
+p{margin:0 0 1em;max-width:68ch}
+.lede{font-size:19px;color:var(--ink-2);max-width:62ch}
+section{padding:84px 0 0}
+.muted{color:var(--ink-3)}
+.fo{color:var(--f-orig)} .fc{color:var(--f-cat)} .ft{color:var(--f-tmpl)}
+
+/* ---------- hero ---------- */
+.hero{background:var(--band);color:var(--band-ink);padding:56px 0 64px}
+.hero-grid{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr);gap:56px;align-items:start}
+.wordmark{font:700 clamp(60px,7.4vw,104px)/.9 var(--cond);letter-spacing:-.02em;margin:0 0 20px;white-space:nowrap}
+.wordmark i{font-style:normal;color:var(--hivis)}
+.title{font:500 23px/1.3 var(--sans);color:#DCE3E0;max-width:30ch;margin-bottom:28px}
+.authors{font-size:16px;line-height:1.7;color:var(--band-ink);margin-bottom:6px}
+.authors sup{color:var(--band-2);font-size:11px;margin-left:1px}
+.affil{font-size:14px;color:var(--band-2);line-height:1.55;margin-bottom:28px}
+.links{display:flex;flex-wrap:wrap;gap:10px}
+.lbtn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:6px;font-weight:600;font-size:15px;
+  text-decoration:none;color:var(--band-ink);border:1px solid #3A4753;background:transparent;cursor:pointer;font-family:inherit}
+.lbtn:hover{border-color:#8997A3}
+.lbtn.primary{background:var(--hivis);color:#16202A;border-color:var(--hivis-deep)}
+.lbtn.primary:hover{background:#FFD21A}
+.lbtn[aria-disabled="true"]{opacity:.5;cursor:default}
+.lbtn svg{width:16px;height:16px;flex:none}
+.soon{font-weight:400;font-size:12px;color:var(--band-2)}
+
+.scene{position:relative;border-radius:var(--r);overflow:hidden;background:#0B1116;aspect-ratio:4/3}
+.scene img{width:100%;height:100%;object-fit:cover}
+.scene svg{position:absolute;inset:0;width:100%;height:100%}
+.scene .tgt{transition:opacity .5s}
+.scene-cap{position:absolute;left:14px;bottom:12px;font-size:13px;color:#DCE3E0;background:rgba(14,21,27,.72);padding:3px 9px;border-radius:4px}
+.asks{margin-top:14px;display:grid;gap:8px}
+.ask{display:grid;grid-template-columns:4px minmax(0,1fr) 176px;gap:14px;align-items:center;padding:10px 14px 10px 0;
+  border-radius:6px;background:#1D2833;border:1px solid transparent;cursor:pointer;text-align:left;color:inherit;font:inherit;width:100%}
+.ask:hover{border-color:#3A4753}
+.ask[aria-pressed="true"]{border-color:#5A6875;background:#223040}
+.ask .sw{align-self:stretch;border-radius:0 2px 2px 0}
+.ask .k{display:block;font-size:13px;color:var(--band-2)}
+.ask q{display:block;font-size:17px;quotes:"\201C" "\201D";color:#fff}
+.ask .meter{font-size:13px;color:var(--band-2);text-align:right}
+.ask .meter b{display:block;font:600 22px/1.1 var(--cond);color:#fff}
+.ask .bar{height:4px;background:#33414D;border-radius:2px;margin-top:5px;overflow:hidden}
+.ask .bar i{display:block;height:100%;border-radius:2px}
+.hero-note{font-size:13.5px;color:var(--band-2);margin-top:12px;max-width:none}
+
+/* ---------- nav ---------- */
+.nav{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--rule);padding-top:env(safe-area-inset-top,0px)}
+.nav .wrap{display:flex;align-items:center;gap:6px;height:56px;overflow-x:auto;scrollbar-width:none}
+.nav .mini{font:700 20px/1 var(--cond);margin-right:18px;white-space:nowrap;color:var(--ink);text-decoration:none}
+.nav .mini i{font-style:normal;color:var(--hivis-deep)}
+.nav a.sec{color:var(--ink-2);text-decoration:none;padding:6px 10px;border-radius:5px;font-size:15px;font-weight:500;white-space:nowrap}
+.nav a.sec:hover{color:var(--ink);background:var(--rule-2)}
+.nav a.sec[aria-current="true"]{color:var(--ink);box-shadow:inset 0 -2px 0 var(--hivis-deep);border-radius:0}
+.theme{margin-left:auto;border:1px solid var(--rule);background:var(--raised);color:var(--ink-2);border-radius:5px;padding:5px 10px;font:inherit;font-size:14px;cursor:pointer;white-space:nowrap}
+
+/* ---------- overview ---------- */
+.over{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,4fr);gap:56px}
+.abstract p{font-size:17.5px;line-height:1.65}
+.facts{margin:6px 0 0;padding:20px 22px;background:var(--raised);border:1px solid var(--rule);border-radius:var(--r);display:grid;gap:14px;align-self:start}
+.facts div{display:grid;grid-template-columns:96px 1fr;gap:12px;align-items:baseline}
+.facts dt{font:700 30px/1 var(--cond)}
+.facts dd{margin:0;color:var(--ink-2);font-size:15px;line-height:1.4}
+
+/* ---------- findings ---------- */
+.findings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 40px;margin:28px 0 8px}
+.finding{border-top:2px solid var(--ink);padding-top:12px}
+.finding h3{margin-bottom:6px}
+.finding p{color:var(--ink-2);font-size:16px;margin:0}
+.panel{background:var(--raised);border:1px solid var(--rule);border-radius:var(--r);padding:22px 24px;margin-top:28px}
+.panel-head{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 24px;margin-bottom:14px}
+.panel-head h3{font-size:20px}
+.panel-head p{margin:2px 0 0;color:var(--ink-2);font-size:15px}
+.panel-head .ctl{margin-left:auto;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:5px;overflow:hidden}
+.seg button{border:0;background:var(--raised);color:var(--ink-2);padding:5px 11px;font:inherit;font-size:14px;cursor:pointer}
+.seg button+button{border-left:1px solid var(--rule)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.legend{display:flex;flex-wrap:wrap;gap:16px;font-size:14px;color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.chart{width:100%;overflow-x:auto}
+.chart svg{display:block;width:100%;height:auto;min-width:620px;font-family:var(--sans)}
+.chart text{fill:var(--ink-2);font-size:12px}
+.chart .axis line,.chart .axis path{stroke:var(--rule)}
+.chart .grid line{stroke:var(--rule-2)}
+.chart .lab{fill:var(--ink);font-weight:600;font-size:13px}
+.chart .row:hover .lab{text-decoration:underline}
+.chart .hl rect.bg{fill:color-mix(in srgb,var(--hivis) 22%,transparent)}
+.tip{position:fixed;z-index:50;pointer-events:none;background:var(--ink);color:var(--bg);font-size:13.5px;line-height:1.45;padding:8px 10px;border-radius:6px;
+  max-width:280px;opacity:0;transition:opacity .12s}
+.tip b{font-weight:600}
+.caption{font-size:14.5px;color:var(--ink-3);margin:12px 0 0;max-width:none}
+.tally{display:flex;height:34px;border-radius:5px;overflow:hidden;margin:6px 0 6px;max-width:560px}
+.tally div{display:flex;align-items:center;padding:0 10px;color:#fff;font-weight:600;font-size:14px;white-space:nowrap}
+
+/* ---------- benchmark ---------- */
+.gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:26px}
+.shot{margin:0;background:var(--raised);border:1px solid var(--rule);border-radius:var(--r);overflow:hidden}
+.shot button{position:relative;display:block;width:100%;padding:0;border:0;background:#0B1116;aspect-ratio:4/3;cursor:pointer}
+.shot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .35s}
+.shot .ann{opacity:0}
+.shot button[aria-pressed="true"] .ann{opacity:1}
+.shot .toggle{position:absolute;right:10px;top:10px;font-size:12.5px;font-weight:600;background:rgba(14,21,27,.78);color:#fff;padding:3px 8px;border-radius:4px}
+.shot figcaption{padding:10px 14px 12px;font-size:14.5px}
+.shot .dom{font-weight:600;display:block;margin-bottom:3px}
+.shot .qs{color:var(--ink-2);display:block}
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:40px;margin-top:48px}
+.sources{margin:0;display:grid;gap:14px}
+.sources dt{font-weight:600}
+.sources dd{margin:2px 0 0;color:var(--ink-2);font-size:15.5px}
+table{border-collapse:collapse;width:100%;font-size:15px}
+.taxo td,.taxo th{padding:8px 10px;border-bottom:1px solid var(--rule-2);text-align:left;vertical-align:top}
+.taxo th{font-size:13px;color:var(--ink-3);font-weight:600}
+.taxo td:first-child{font-weight:600;white-space:nowrap}
+.taxo td:nth-child(2){color:var(--ink-2)}
+.taxo q{quotes:"\201C" "\201D"}
+figure.fig{margin:48px 0 0}
+figure.fig .imgbox{background:#fff;border:1px solid var(--rule);border-radius:var(--r);padding:12px;overflow:hidden}
+figure.fig figcaption{font-size:14.5px;color:var(--ink-3);margin-top:10px;max-width:90ch}
+
+/* ---------- protocol ---------- */
+.forms3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:24px 0 36px}
+.form3{background:var(--raised);border:1px solid var(--rule);border-top:4px solid;border-radius:var(--r);padding:14px 16px}
+.form3 h3{font-size:17px;margin-bottom:4px}
+.form3 code{display:block;font:14px/1.45 var(--mono);color:var(--ink-2);background:var(--bg);padding:6px 8px;border-radius:4px;margin:8px 0 6px;word-break:break-word}
+.form3 p{font-size:15px;color:var(--ink-2);margin:0}
+.eqs{display:grid;gap:0;border-top:1px solid var(--rule)}
+.eq{display:grid;grid-template-columns:200px minmax(0,1fr) minmax(0,30ch);gap:12px 28px;align-items:center;padding:22px 0;border-bottom:1px solid var(--rule)}
+.eq h3{font-size:18px}
+.eq math{font-size:19px;display:block;margin:0;overflow-x:auto;color:var(--ink)}
+.eq p{font-size:15.5px;color:var(--ink-2);margin:0}
+
+/* ---------- results ---------- */
+.tbl{overflow-x:auto;border:1px solid var(--rule);border-radius:var(--r);background:var(--raised);margin-top:14px}
+.res th,.res td{padding:8px 12px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--rule-2)}
+.res th:first-child,.res td:first-child{text-align:left;position:sticky;left:0;background:var(--raised)}
+.res th{font-size:13px;color:var(--ink-2);font-weight:600;cursor:pointer;user-select:none;background:var(--surface)}
+.res th:first-child{background:var(--surface)}
+.res th[aria-sort="descending"]::after{content:" \25BE"}
+.res th[aria-sort="ascending"]::after{content:" \25B4"}
+.res td.m{font:600 16px/1.2 var(--cond);text-align:left}
+.res td .fam{font:400 12px var(--sans);color:var(--ink-3);margin-left:6px}
+.res tr:last-child td{border-bottom:0}
+.res td.b1{background:color-mix(in srgb,var(--f-cat) 22%,transparent);font-weight:600}
+.res td.b2{background:color-mix(in srgb,var(--f-cat) 12%,transparent)}
+.res td.rt{color:var(--f-cat);font-weight:600}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:22px}
+.two .panel{margin-top:22px}
+.two .chart svg{min-width:0}
+
+/* ---------- demo ---------- */
+.demo{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:40px;align-items:start;margin-top:24px}
+.video{background:#0B1116;border-radius:var(--r);overflow:hidden;aspect-ratio:16/10;display:grid;place-items:center;color:#A9B4BD;text-align:center}
+.video video{width:100%;height:100%;object-fit:contain;background:#000}
+.video .fallback{padding:28px;max-width:46ch}
+.video .fallback b{display:block;color:#fff;font-size:18px;margin-bottom:6px}
+.modes{margin:0;display:grid;gap:14px}
+.modes dt{font-weight:600}
+.modes dd{margin:2px 0 0;color:var(--ink-2);font-size:15.5px}
+pre{font:14px/1.55 var(--mono);background:var(--band);color:#E3E8E6;padding:16px 18px;border-radius:var(--r);overflow-x:auto;margin:18px 0 0}
+pre .c{color:#8C98A2}
+
+/* ---------- cite ---------- */
+.cite{position:relative}
+.cite pre{margin-top:10px;white-space:pre}
+.copy{position:absolute;right:12px;top:12px;border:1px solid #3A4753;background:#1D2833;color:#E3E8E6;border-radius:5px;padding:5px 11px;font:inherit;font-size:13.5px;cursor:pointer}
+.copy:hover{border-color:#8997A3}
+.ack{font-size:15px;color:var(--ink-2);margin-top:28px}
+footer{margin-top:84px;padding:28px 0 40px;border-top:1px solid var(--rule);font-size:14px;color:var(--ink-3)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-between}
+
+@media (max-width:960px){
+  .hero-grid,.over,.cols,.demo,.two{grid-template-columns:1fr}
+  .hero-grid{gap:36px}
+  .gallery{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .forms3{grid-template-columns:1fr}
+  .eq{grid-template-columns:1fr}
+  .findings{grid-template-columns:1fr}
+  h2{font-size:34px}
+}
+@media (max-width:560px){
+  .wrap{padding:0 18px}
+  .gallery{grid-template-columns:1fr}
+  .ask{grid-template-columns:4px minmax(0,1fr)}
+  .ask .meter{grid-column:2;text-align:left}
+  .facts div{grid-template-columns:80px 1fr}
+  section{padding-top:64px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<header class="hero" id="top">
+  <div class="wrap hero-grid">
+    <div>
+      <h1 class="wordmark">Pro<i>-</i>Bench</h1>
+      <p class="title">Prompt-robust open-vocabulary visual grounding across real-world heterogeneous environments</p>
+      <p class="authors">
+        Linus Nwankwo<sup>1,*</sup>, Muslim Alaran<sup>1</sup>, Christian Rauch<sup>1</sup>,
+        Stanley Chukwuebuka Obilikpa<sup>2</sup>, Elmar Rueckert<sup>1</sup>
+      </p>
+      <p class="affil"><sup>1</sup>Chair of Cyber-Physical Systems, Montanuniversität Leoben, Austria<br>
+        <sup>2</sup>Department of Design Engineering and Mathematics, Middlesex University, London, UK<br>
+        <sup>*</sup>Corresponding author</p>
+      <div class="links" id="links"></div>
+    </div>
+    <div>
+      <div class="scene">
+        <img src="assets/tunnel.jpg" alt="A dimly lit mining tunnel with a sandy floor leading to an exit door at the far end." width="1200" height="900">
+        <svg viewBox="0 0 800 600" aria-hidden="true">
+          <g class="tgt" id="heroTgt">
+            <image href="assets/tunnel_target.png" x="0" y="0" width="800" height="600"/>
+            <rect id="heroBox" x="531" y="104" width="65" height="95" fill="none" stroke="#F2C200" stroke-width="3"/>
+          </g>
+        </svg>
+        <span class="scene-cap">Annotated target, subterranean scene</span>
+      </div>
+      <div class="asks" id="asks" role="group" aria-label="Ways to ask for the target"></div>
+      <p class="hero-note" id="heroNote"></p>
+    </div>
+  </div>
+</header>
+
+<nav class="nav" aria-label="Sections">
+  <div class="wrap">
+    <a class="mini" href="#top">Pro<i>-</i>Bench</a>
+    <a class="sec" href="#overview">Overview</a>
+    <a class="sec" href="#findings">Findings</a>
+    <a class="sec" href="#benchmark">Benchmark</a>
+    <a class="sec" href="#protocol">Protocol</a>
+    <a class="sec" href="#results">Results</a>
+    <a class="sec" href="#examples">Examples</a>
+    <a class="sec" href="#demo">Live demo</a>
+    <a class="sec" href="#cite">Cite</a>
+    <button class="theme" id="themeBtn" type="button">Dark mode</button>
+  </div>
+</nav>
+
+<main>
+<section id="overview">
+  <div class="wrap over">
+    <div class="abstract">
+      <h2>Abstract</h2>
+      <p>Open-vocabulary visual grounding enables robots to localise task-relevant entities from natural-language queries without dependence on predefined perceptual taxonomies. However, existing benchmarks largely rely on short category labels and web-scraped imagery, leaving it unclear whether open-vocabulary models can robustly ground diverse queries and visual conditions under real deployments.</p>
+      <p>We introduce Pro-Bench, a prompt-conditioned benchmark for open-vocabulary visual grounding in heterogeneous, real-world environments. Pro-Bench includes 13k+ RGB frames from independent robotic domains (subterranean, industrial, indoor, outdoor, urban), with 74.5k manual instance annotations and 515 target queries covering categorical, attributive, relational, affordance, state, part-whole, negative, and compositional semantics.</p>
+      <p>We benchmarked 16 open-vocabulary model configurations in strict zero-shot inference, measuring localisation accuracy across IoU thresholds, end-to-end inference latency, prompt-induced performance variation, and target recovery consistency. Our results show that prompt-robustness is strongly architecture-dependent. Most model configurations (10/16) perform best with short category labels, whereas free-form queries yield the highest accuracy for only one. Moreover, similar aggregate mAP can conceal substantial differences in consistent target recovery across reformulations. Pro-Bench enables systematic evaluation of these gaps and supports prompt-robust visual grounding.</p>
+    </div>
+    <dl class="facts" aria-label="Benchmark at a glance">
+      <div><dt>13k+</dt><dd>RGB frames captured by real robots, no web or synthetic imagery</dd></div>
+      <div><dt>74.5k</dt><dd>hand-drawn polygon instances, boxes and masks in COCO format</dd></div>
+      <div><dt>515</dt><dd>operator-style queries, each with three target-preserving formulations</dd></div>
+      <div><dt>8</dt><dd>semantic prompt types, from categorical to compositional</dd></div>
+      <div><dt>16</dt><dd>model configurations, evaluated strictly zero-shot on one RTX 4090</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section id="findings">
+  <div class="wrap">
+    <h2>What the benchmark found</h2>
+    <p class="lede">An operator can ask for the same object in several ways. Most current models reward the shortest phrasing, and some break on harmless rewording.</p>
+    <div class="findings">
+      <div class="finding"><h3>Short labels still win</h3><p>10 of 16 configurations score highest with the categorical label, 5 with the template form, and only YOLOE-X with the operator's free-form query.</p></div>
+      <div class="finding"><h3>A template can break a model</h3><p>Prefixing "a photo of" drops SAM3 from 0.417 to 0.044 mAP.5, while G-DINO-T gains 0.069 from the same change.</p></div>
+      <div class="finding"><h3>Stable boxes are not reliable recovery</h3><p>SAM3's boxes barely move between phrasings (PLC 0.984), yet it recovers only 2.4% of targets under all three (PCR 0.024).</p></div>
+      <div class="finding"><h3>Real time costs accuracy</h3><p>Within a 30 Hz budget, OmDet-T is the most accurate at 0.431 mAP.5. SAM3-Lite leads overall at 0.696 but needs 683 ms per frame.</p></div>
+    </div>
+
+    <div class="panel" id="sensPanel">
+      <div class="panel-head">
+        <div><h3>Same target, three phrasings</h3>
+          <p>mAP.5 of each model under each formulation. The line spans the prompt-induced variation &Delta;<sub>max</sub>; the ringed dot is the model's best formulation.</p></div>
+        <div class="ctl">
+          <div class="legend"><span><i style="background:var(--f-orig)"></i>Original</span><span><i style="background:var(--f-cat)"></i>Categorical</span><span><i style="background:var(--f-tmpl)"></i>Template</span></div>
+          <div class="seg" role="group" aria-label="Order models by" id="sensSort">
+            <button data-s="map" aria-pressed="true">By accuracy</button>
+            <button data-s="dmax" aria-pressed="false">By sensitivity</button>
+          </div>
+        </div>
+      </div>
+      <div class="chart" id="sensChart"></div>
+      <p class="caption">Best formulation across the 16 configurations:</p>
+      <div class="tally" id="tally" aria-label="Best formulation counts"></div>
+    </div>
+  </div>
+</section>
+
+<section id="benchmark">
+  <div class="wrap">
+    <h2>The benchmark</h2>
+    <p class="lede">Frames come from real robot sensors in five kinds of environment, so the models face low light, occlusion, odd viewpoints and domain-specific objects. Select a scene to see its annotated targets.</p>
+    <div class="gallery" id="gallery"></div>
+
+    <div class="cols">
+      <div>
+        <h3 style="margin-bottom:14px">Where the frames come from</h3>
+        <dl class="sources">
+          <div><dt>Subterranean and industrial</dt><dd>Tunnels, quarries, mines and excavation sites from DARPA SubT, EnvoDat, Hilti-SLAM and GOOSE-Ex.</dd></div>
+          <div><dt>Outdoor and urban</dt><dd>Forest trails, unstructured terrain and street scenes from EnvoDat, GOOSE-Ex, KITTI, MCD and our own campus recordings.</dd></div>
+          <div><dt>Indoor and laboratory</dt><dd>Offices, labs and tabletops with clutter and look-alike objects, from TUM RGB-D, EnvoDat and in-house scenes.</dd></div>
+          <div><dt>Annotation</dt><dd>Seven annotators drew fine polygon boundaries for common and uncommon objects, and a separate reviewer checked every annotation against its query. Object sizes: 51.3% large, 28.4% medium, 20.3% small; median mask area is 2.5% of the image.</dd></div>
+        </dl>
+      </div>
+      <div>
+        <h3 style="margin-bottom:8px">Eight kinds of query</h3>
+        <table class="taxo">
+          <thead><tr><th>Type</th><th>Identifies the target by</th><th>Example</th></tr></thead>
+          <tbody id="taxo"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <figure class="fig">
+      <div class="imgbox"><img src="assets/fig2_pipeline.jpg" alt="Pro-Bench construction pipeline: multi-domain scenes, human annotation of target instances, prompt construction with eight semantic types and three formulations, and dataset statistics." loading="lazy" width="1800" height="684"></div>
+      <figcaption>Construction pipeline and dataset statistics. Each target gets a human-written free-form query and at least one semantic type, from which the categorical and template-wrapped variants are derived.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="protocol">
+  <div class="wrap">
+    <h2>Measuring prompt robustness</h2>
+    <p class="lede">Every target is queried three ways. Each formulation keeps the same referent, so a robust model should find the same object every time.</p>
+    <div class="forms3">
+      <div class="form3" style="border-top-color:var(--f-orig)"><h3 class="fo">Original <span class="muted">p<sup>orig</sup></span></h3>
+        <code>a person walking with a bicycle</code><p>The operator's free-form query, as written by the annotator.</p></div>
+      <div class="form3" style="border-top-color:var(--f-cat)"><h3 class="fc">Categorical <span class="muted">p<sup>cat</sup></span></h3>
+        <code>a person</code><p>A manually reviewed class-level noun phrase that drops attributes, relations, state and affordance.</p></div>
+      <div class="form3" style="border-top-color:var(--f-tmpl)"><h3 class="ft">Template <span class="muted">p<sup>tmpl</sup></span></h3>
+        <code>a photo of a person walking with a bicycle</code><p>The original query wrapped in the CLIP-style prompt template.</p></div>
+    </div>
+    <div class="eqs">
+      <div class="eq">
+        <h3>Prompt-induced variation</h3>
+        <math display="block"><mrow><msub><mi>&#916;</mi><mtext>max</mtext></msub><mo>=</mo><munder><mo movablelimits="false">max</mo><mrow><mi>k</mi><mo>&#8712;</mo><mi>K</mi></mrow></munder><msub><mi>m</mi><mi>k</mi></msub><mo>&#8722;</mo><munder><mo movablelimits="false">min</mo><mrow><mi>k</mi><mo>&#8712;</mo><mi>K</mi></mrow></munder><msub><mi>m</mi><mi>k</mi></msub></mrow></math>
+        <p>The spread of mAP.5 across the three formulations. Larger means the model depends more on how the target is phrased.</p>
+      </div>
+      <div class="eq">
+        <h3>Prompt-consistent recall</h3>
+        <math display="block"><mrow><msub><mtext>PCR</mtext><mi>&#964;</mi></msub><mo>=</mo><mfrac><mn>1</mn><msub><mi>N</mi><mi>c</mi></msub></mfrac><munderover><mo>&#8721;</mo><mrow><mi>i</mi><mo>=</mo><mn>1</mn></mrow><msub><mi>N</mi><mi>c</mi></msub></munderover><munder><mo>&#8719;</mo><mrow><mi>k</mi><mo>&#8712;</mo><msubsup><mi>K</mi><mi>i</mi><mtext>coref</mtext></msubsup></mrow></munder><msubsup><mi>r</mi><mi>i</mi><mrow><mo stretchy="false">(</mo><mi>k</mi><mo stretchy="false">)</mo></mrow></msubsup><mo stretchy="false">(</mo><mi>&#964;</mi><mo stretchy="false">)</mo></mrow></math>
+        <p>The share of targets recovered at IoU &ge; 0.5 under <em>every</em> formulation. One miss under any phrasing counts as a failure.</p>
+      </div>
+      <div class="eq">
+        <h3>Localisation consistency</h3>
+        <math display="block"><mrow><mtext>PLC</mtext><mo>=</mo><mfrac><mn>1</mn><mrow><mo stretchy="false">|</mo><msup><mi>Q</mi><mo>*</mo></msup><mo stretchy="false">|</mo></mrow></mfrac><munder><mo>&#8721;</mo><mrow><mi>i</mi><mo>&#8712;</mo><msup><mi>Q</mi><mo>*</mo></msup></mrow></munder><mfrac><mn>2</mn><mrow><msub><mi>K</mi><mi>i</mi></msub><mo stretchy="false">(</mo><msub><mi>K</mi><mi>i</mi></msub><mo>&#8722;</mo><mn>1</mn><mo stretchy="false">)</mo></mrow></mfrac><munder><mo>&#8721;</mo><mrow><mi>a</mi><mo>&lt;</mo><mi>b</mi></mrow></munder><mtext>IoU</mtext><mo stretchy="false">(</mo><msubsup><mover><mi>B</mi><mo>^</mo></mover><mi>i</mi><mrow><mo stretchy="false">(</mo><mi>a</mi><mo stretchy="false">)</mo></mrow></msubsup><mo>,</mo><msubsup><mover><mi>B</mi><mo>^</mo></mover><mi>i</mi><mrow><mo stretchy="false">(</mo><mi>b</mi><mo stretchy="false">)</mo></mrow></msubsup><mo stretchy="false">)</mo></mrow></math>
+        <p>For targets recovered under all formulations, the mean pairwise IoU of the matched boxes: how much the box moves when the wording changes.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="results">
+  <div class="wrap">
+    <h2>Results</h2>
+    <p class="lede">All 16 configurations run zero-shot with frozen public weights and each model's own prompt interface. Latency is end-to-end on one RTX 4090, after three warm-up passes.</p>
+
+    <div class="panel">
+      <div class="panel-head">
+        <div><h3>Accuracy against latency</h3><p>The line traces the Pareto frontier; the shaded band is the 30 Hz real-time budget of a standard RGB-D camera.</p></div>
+        <div class="ctl">
+          <div class="legend"><span><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="5" fill="var(--ink-2)"/></svg>Transformer</span><span><svg width="12" height="12" aria-hidden="true"><rect x="1" y="1" width="10" height="10" fill="var(--ink-2)"/></svg>Real-time</span><span><svg width="12" height="12" aria-hidden="true"><path d="M6 0 12 6 6 12 0 6Z" fill="var(--ink-2)"/></svg>Segmentation</span></div>
+          <div class="seg" role="group" aria-label="Accuracy metric" id="parMetric">
+            <button data-m="map50" aria-pressed="true">mAP.5</button>
+            <button data-m="map75" aria-pressed="false">mAP.75</button>
+            <button data-m="map5095" aria-pressed="false">mAP.5:.95</button>
+          </div>
+        </div>
+      </div>
+      <div class="chart" id="parChart"></div>
+    </div>
+
+    <div class="two">
+      <div class="panel">
+        <div class="panel-head"><div><h3>Recovery against stability</h3><p>PCR.5 (found under all three phrasings) against PLC (box stability once found).</p></div></div>
+        <div class="chart" id="pcrChart"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-head"><div><h3>Localisation tightness</h3><p>How much of each model's mAP.5 survives at stricter overlap (mAP.5:.95 &divide; mAP.5).</p></div></div>
+        <div class="chart" id="tightChart"></div>
+      </div>
+    </div>
+
+    <h3 style="margin-top:44px">Full results</h3>
+    <p class="caption" style="margin-top:4px">Select a column to sort. Shaded cells are the best and second-best values; latencies within the 30 Hz budget are highlighted.</p>
+    <div class="tbl"><table class="res" id="resTable"></table></div>
+  </div>
+</section>
+
+<section id="examples">
+  <div class="wrap">
+    <h2>Qualitative examples</h2>
+    <p class="lede">A model can find the right region yet box it far too loosely, or miss a target that is plainly visible when the query describes it indirectly. No representative model returns a valid box for "an object suitable for sensor calibration", although the calibration board fills the frame.</p>
+    <figure class="fig" style="margin-top:24px">
+      <div class="imgbox"><img src="assets/fig6_qualitative.jpg" alt="Grid of seven scenes. Rows show the original image, the target queries with ground-truth boxes, and top-confidence predictions from YOLO-World-X, YOLOE-X, SAM 3 and OWLv2-L." loading="lazy" width="1800" height="1162"></div>
+      <figcaption>Top-confidence prediction per query for four representative models: real-time detection (YOLO-W-X, YOLOE-X), open-vocabulary segmentation (SAM3) and a transformer detector (OWLv2-L).</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section id="demo">
+  <div class="wrap">
+    <h2>Live demo</h2>
+    <p class="lede">The demo runs all 16 configurations side by side on your own images or a live camera, including RealSense depth, and shows the prompt-robustness protocol on a single scene.</p>
+    <div class="demo">
+      <div class="video" id="videoBox">
+        <video id="demoVideo" controls playsinline preload="metadata" poster="" hidden></video>
+        <div class="fallback" id="videoFallback"><b>Run it on your GPU</b>The demo needs the model weights, so it runs locally. The commands on the right start it on any CUDA machine.</div>
+      </div>
+      <div>
+        <dl class="modes">
+          <div><dt>Compare models</dt><dd>One query, one scene, every selected model, with live latency next to the paper's figure.</dd></div>
+          <div><dt>Prompt robustness</dt><dd>Runs the original, categorical and template forms per model. Mark the target and each model reports whether it found it under each phrasing.</dd></div>
+          <div><dt>Live camera</dt><dd>Webcam, OpenCV or RealSense input. Each model runs on the newest frame at its own speed, and you can edit the query while it streams.</dd></div>
+        </dl>
+<pre><span class="c"># clone the code release, then</span>
+pip install -r requirements.txt
+python demo_server.py --config configs/benchmark.yaml \
+    --keep-resident --examples-dir demo_examples
+<span class="c"># open http://localhost:8000</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="cite">
+  <div class="wrap">
+    <h2>Cite Pro-Bench</h2>
+    <div class="cite">
+      <button class="copy" id="copyBib" type="button">Copy BibTeX</button>
+<pre id="bib">@article{nwankwo2026probench,
+  title   = {Pro-Bench: Prompt-Robust Open-Vocabulary Visual Grounding
+             Across Real-World Heterogeneous Environments},
+  author  = {Nwankwo, Linus and Alaran, Muslim and Rauch, Christian and
+             Obilikpa, Stanley Chukwuebuka and Rueckert, Elmar},
+  journal = {arXiv preprint},
+  year    = {2026}
+}</pre>
+    </div>
+    <p class="ack">This work is supported by the MINEVIEW project (#FO999927835), funded by the Republic of Austria, Federal Ministry of Environment, Innovation and Technology.</p>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>Pro-Bench, Chair of Cyber-Physical Systems, Montanuniversität Leoben</span>
+    <span>Dataset, annotations and per-model configurations are released for research use.</span>
+  </div>
+</footer>
+
+<div class="tip" id="tip" role="tooltip"></div>
+
+<script>
+"use strict";
+const ASSET = {"bar.jpg": "assets/bar.jpg", "bar_ann.jpg": "assets/bar_ann.jpg", "barrels.jpg": "assets/barrels.jpg", "barrels_ann.jpg": "assets/barrels_ann.jpg", "dog.jpg": "assets/dog.jpg", "dog_ann.jpg": "assets/dog_ann.jpg", "excavation.jpg": "assets/excavation.jpg", "excavation_ann.jpg": "assets/excavation_ann.jpg", "fig2_pipeline.jpg": "assets/fig2_pipeline.jpg", "fig6_qualitative.jpg": "assets/fig6_qualitative.jpg", "office.jpg": "assets/office.jpg", "office_ann.jpg": "assets/office_ann.jpg", "og.jpg": "assets/og.jpg", "tabletop.jpg": "assets/tabletop.jpg", "tabletop_ann.jpg": "assets/tabletop_ann.jpg", "tunnel.jpg": "assets/tunnel.jpg", "tunnel_target.png": "assets/tunnel_target.png"};
+/* ------------------------------------------------------------------
+   Edit these links when the release is public. Empty links render as
+   "coming soon" and are not clickable.
+------------------------------------------------------------------ */
+const LINKS = {
+  paper:   "",   // e.g. https://arxiv.org/abs/2609.xxxxx
+  pdf:     "",
+  code:    "",   // e.g. https://github.com/<org>/pro-bench
+  dataset: "",   // e.g. https://huggingface.co/datasets/<org>/pro-bench
+  video:   "",   // e.g. assets/demo.mp4 or a hosted MP4
+};
+
+/* Table II of the paper. */
+const MODELS = [
+ ["SAM3-Lite","Segmentation",.696,.594,.562,683.0,.737,.541,.196,"cat",.847,.917],
+ ["OWLv2-L","Transformer",.567,.477,.443,244.8,.540,.569,.029,"tmpl",.482,.994],
+ ["OWLv2-B","Transformer",.507,.429,.396,56.6,.492,.509,.017,"tmpl",.426,.996],
+ ["SAM3","Segmentation",.417,.375,.355,266.7,.440,.044,.396,"cat",.024,.984],
+ ["OmDet-T","Transformer",.431,.355,.333,22.7,.454,.363,.090,"cat",.243,.958],
+ ["YOLOE-X","Real-time",.274,.242,.228,44.1,.188,.264,.086,"orig",.072,.996],
+ ["YOLOE-S","Real-time",.251,.215,.201,38.5,.182,.299,.117,"tmpl",.092,.997],
+ ["OWL-ViT","Transformer",.238,.201,.179,15.3,.257,.234,.023,"cat",.180,.999],
+ ["G-DINO-S-T","Transformer",.152,.126,.121,294.8,.126,.177,.051,"tmpl",.082,.965],
+ ["YOLO-W-X","Real-time",.171,.147,.132,12.9,.216,.163,.054,"cat",.089,.967],
+ ["Detic","Transformer",.180,.136,.129,61.7,.190,.174,.016,"cat",.147,.998],
+ ["YOLO-W-S","Real-time",.140,.115,.104,7.3,.167,.134,.033,"cat",.075,.967],
+ ["G-DINO-T","Transformer",.055,.048,.045,201.6,.037,.124,.087,"tmpl",.026,.989],
+ ["LLMDet-L","Transformer",.075,.005,.020,240.1,.108,.030,.078,"cat",.007,.733],
+ ["MM-G-D-L","Transformer",.040,.001,.009,236.1,.041,.039,.002,"cat",.006,.773],
+ ["MM-G-D-T","Transformer",.073,.000,.016,59.6,.078,.002,.076,"cat",.001,.760],
+].map(r => ({name:r[0],fam:r[1],map50:r[2],map75:r[3],map5095:r[4],lat:r[5],orig:r[2],cat:r[6],tmpl:r[7],dmax:r[8],best:r[9],pcr:r[10],plc:r[11]}));
+const RT = 33.3;
+const F = ["orig","cat","tmpl"], FL = {orig:"Original",cat:"Categorical",tmpl:"Template"};
+const FC = {orig:"var(--f-orig)",cat:"var(--f-cat)",tmpl:"var(--f-tmpl)"}, FD = {orig:"var(--d-orig)",cat:"var(--d-cat)",tmpl:"var(--d-tmpl)"};
+const $ = s => document.querySelector(s), $$ = s => Array.from(document.querySelectorAll(s));
+const NS = "http://www.w3.org/2000/svg";
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const f3 = v => v.toFixed(3);
+
+/* ---------------- links ---------------- */
+const ICON = {
+  paper:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 1.5h5.5L13 5v9.5H4z"/><path d="M9 1.5V5h4"/></svg>',
+  code:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M5.5 4 1.5 8l4 4M10.5 4l4 4-4 4"/></svg>',
+  data:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><ellipse cx="8" cy="3.5" rx="5.5" ry="2"/><path d="M2.5 3.5v9c0 1.1 2.5 2 5.5 2s5.5-.9 5.5-2v-9M2.5 8c0 1.1 2.5 2 5.5 2s5.5-.9 5.5-2"/></svg>',
+  demo:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="1.5" y="2.5" width="13" height="9" rx="1"/><path d="M5 14.5h6"/></svg>',
+  cite:'<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 9.5c0-3 1-5 3.5-6M9 9.5c0-3 1-5 3.5-6"/><circle cx="4.5" cy="11" r="2"/><circle cx="10.5" cy="11" r="2"/></svg>',
+};
+function renderLinks() {
+  const items = [
+    {label:"Paper", href:LINKS.paper || LINKS.pdf, icon:ICON.paper, primary:true},
+    {label:"Code", href:LINKS.code, icon:ICON.code},
+    {label:"Dataset", href:LINKS.dataset, icon:ICON.data},
+    {label:"Live demo", href:"#demo", icon:ICON.demo},
+    {label:"BibTeX", href:"#cite", icon:ICON.cite},
+  ];
+  $("#links").innerHTML = items.map(i => i.href
+    ? `<a class="lbtn${i.primary ? " primary" : ""}" href="${esc(i.href)}">${i.icon}${i.label}</a>`
+    : `<span class="lbtn" aria-disabled="true">${i.icon}${i.label} <span class="soon">coming soon</span></span>`).join("");
+}
+
+/* ---------------- hero ---------------- */
+const HERO = {
+  orig: "a tunnel exit door ahead of sandy path",
+  cat:  "a door",
+  tmpl: "a photo of a tunnel exit door ahead of sandy path",
+};
+function renderHero() {
+  const mean = f => MODELS.reduce((s, m) => s + m[f], 0) / MODELS.length;
+  const best = f => MODELS.filter(m => m.best === f).length;
+  const maxMean = Math.max(...F.map(mean));
+  $("#asks").innerHTML = F.map(f => `
+    <button class="ask" data-f="${f}" aria-pressed="false">
+      <span class="sw" style="background:${FD[f]}"></span>
+      <span><span class="k">${FL[f]}</span><q>${esc(HERO[f])}</q></span>
+      <span class="meter">best for ${best(f)} of 16 models<b>${mean(f).toFixed(3)}</b>
+        <span class="bar"><i style="width:${(100 * mean(f) / maxMean).toFixed(1)}%;background:${FD[f]}"></i></span></span>
+    </button>`).join("");
+  const note = $("#heroNote"), box = $("#heroBox");
+  const set = f => {
+    $$(".ask").forEach(b => b.setAttribute("aria-pressed", b.dataset.f === f));
+    box.setAttribute("stroke", f ? getComputedStyle(document.documentElement).getPropertyValue(f === "orig" ? "--d-orig" : f === "cat" ? "--d-cat" : "--d-tmpl").trim() : "#F2C200");
+    note.innerHTML = f
+      ? `${FL[f]} phrasing: mean mAP.5 of ${mean(f).toFixed(3)} across the 16 models, and the best choice for ${best(f)} of them. SAM3 alone scores ${MODELS[3][f].toFixed(3)}.`
+      : "Three ways to ask for the same door. Bars show mean mAP.5 over all 515 Pro-Bench queries for the 16 models; select a phrasing for details.";
+  };
+  $$(".ask").forEach(b => b.onclick = () => set(b.getAttribute("aria-pressed") === "true" ? null : b.dataset.f));
+  set(null);
+}
+
+/* ---------------- chart helpers ---------------- */
+function el(tag, attrs = {}, parent) {
+  const n = document.createElementNS(NS, tag);
+  for (const k in attrs) n.setAttribute(k, attrs[k]);
+  if (parent) parent.appendChild(n);
+  return n;
+}
+function txt(parent, x, y, s, attrs = {}) { const t = el("text", {x, y, ...attrs}, parent); t.textContent = s; return t; }
+const tip = $("#tip");
+function showTip(e, html) {
+  tip.innerHTML = html; tip.style.opacity = 1;
+  const r = tip.getBoundingClientRect();
+  let x = e.clientX + 14, y = e.clientY + 14;
+  if (x + r.width > innerWidth - 8) x = e.clientX - r.width - 14;
+  if (y + r.height > innerHeight - 8) y = e.clientY - r.height - 14;
+  tip.style.left = x + "px"; tip.style.top = y + "px";
+}
+function hideTip() { tip.style.opacity = 0; }
+function bindTip(node, html) {
+  node.addEventListener("pointermove", e => showTip(e, html));
+  node.addEventListener("pointerleave", hideTip);
+  node.setAttribute("tabindex", "0");
+  node.addEventListener("focus", () => { const r = node.getBoundingClientRect(); showTip({clientX: r.right, clientY: r.top}, html); });
+  node.addEventListener("blur", hideTip);
+}
+function modelTip(m) {
+  return `<b>${esc(m.name)}</b> (${m.fam})<br>mAP.5: original ${f3(m.orig)}, categorical ${f3(m.cat)}, template ${f3(m.tmpl)}<br>` +
+    `&Delta;max ${f3(m.dmax)}, best: ${FL[m.best].toLowerCase()}<br>PCR.5 ${f3(m.pcr)}, PLC ${f3(m.plc)}<br>Latency ${m.lat} ms`;
+}
+function marker(parent, fam, x, y, r, attrs) {
+  if (fam === "Real-time") return el("rect", {x: x - r, y: y - r, width: 2 * r, height: 2 * r, ...attrs}, parent);
+  if (fam === "Segmentation") return el("path", {d: `M${x} ${y - r * 1.3}L${x + r * 1.3} ${y}L${x} ${y + r * 1.3}L${x - r * 1.3} ${y}Z`, ...attrs}, parent);
+  return el("circle", {cx: x, cy: y, r, ...attrs}, parent);
+}
+
+/* ---------------- sensitivity dumbbell ---------------- */
+let sensSort = "map";
+function renderSens() {
+  const box = $("#sensChart"); box.innerHTML = "";
+  const rows = MODELS.slice().sort((a, b) => sensSort === "map" ? b.orig - a.orig : b.dmax - a.dmax);
+  const W = 1080, L = 120, R = 70, T = 30, RH = 30, H = T + rows.length * RH + 12;
+  const svg = el("svg", {viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "mAP.5 per model under original, categorical and template formulations"}, box);
+  const x = v => L + v / 0.8 * (W - L - R);
+  const g = el("g", {class: "grid"}, svg);
+  for (let v = 0; v <= 0.8001; v += 0.1) {
+    el("line", {x1: x(v), x2: x(v), y1: T - 8, y2: H - 8}, g);
+    txt(svg, x(v), T - 14, v.toFixed(1), {"text-anchor": "middle"});
+  }
+  txt(svg, L - 14, T - 14, "mAP.5", {"text-anchor": "end", fill: "var(--ink-3)"});
+  rows.forEach((m, i) => {
+    const y = T + i * RH + RH / 2;
+    const row = el("g", {class: "row" + (m.name === "SAM3" ? " hl" : "")}, svg);
+    if (m.name === "SAM3") el("rect", {class: "bg", x: 0, y: y - RH / 2 + 1, width: W, height: RH - 2, rx: 4}, row);
+    txt(row, L - 14, y + 4, m.name, {"text-anchor": "end", class: "lab"});
+    const vals = F.map(f => m[f]), lo = Math.min(...vals), hi = Math.max(...vals);
+    el("line", {x1: x(lo), x2: x(hi), y1: y, y2: y, stroke: "var(--ink-3)", "stroke-width": 2.5, "stroke-linecap": "round"}, row);
+    F.forEach(f => {
+      if (f === m.best) el("circle", {cx: x(m[f]), cy: y, r: 10, fill: "none", stroke: FC[f], "stroke-width": 1.8}, row);
+      el("circle", {cx: x(m[f]), cy: y, r: 6, fill: FC[f], stroke: "var(--raised)", "stroke-width": 1.5}, row);
+    });
+    txt(row, x(hi) + 16, y + 4, "\u0394 " + m.dmax.toFixed(3), {fill: "var(--ink-3)"});
+    const hit = el("rect", {x: 0, y: y - RH / 2, width: W, height: RH, fill: "transparent"}, row);
+    bindTip(hit, modelTip(m));
+  });
+  const n = f => MODELS.filter(m => m.best === f).length;
+  $("#tally").innerHTML = ["cat", "tmpl", "orig"].map(f =>
+    `<div style="flex:${n(f)};background:${FC[f]}">${FL[f]} ${n(f)}</div>`).join("");
+}
+
+/* ---------------- Pareto chart ---------------- */
+let parMetric = "map50";
+function renderPareto() {
+  const box = $("#parChart"); box.innerHTML = "";
+  const W = 1080, H = 470, L = 64, R = 30, T = 20, B = 52;
+  const svg = el("svg", {viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Accuracy against latency for 16 models"}, box);
+  const lx = v => L + (Math.log10(v) - Math.log10(5)) / (Math.log10(1000) - Math.log10(5)) * (W - L - R);
+  const ymax = 0.8, y = v => T + (1 - v / ymax) * (H - T - B);
+  el("rect", {x: lx(5), y: T, width: lx(RT) - lx(5), height: H - T - B, fill: "color-mix(in srgb, var(--f-cat) 9%, transparent)"}, svg);
+  txt(svg, lx(RT) - 6, T + 16, "30 Hz budget", {"text-anchor": "end", fill: "var(--f-cat)", "font-weight": 600});
+  el("line", {x1: lx(RT), x2: lx(RT), y1: T, y2: H - B, stroke: "var(--f-cat)", "stroke-dasharray": "5 4", "stroke-width": 1.5}, svg);
+  const g = el("g", {class: "grid"}, svg);
+  [5, 10, 20, 50, 100, 200, 500, 1000].forEach(v => { el("line", {x1: lx(v), x2: lx(v), y1: T, y2: H - B}, g); txt(svg, lx(v), H - B + 20, v, {"text-anchor": "middle"}); });
+  for (let v = 0; v <= ymax + 1e-9; v += 0.1) { el("line", {x1: L, x2: W - R, y1: y(v), y2: y(v)}, g); txt(svg, L - 10, y(v) + 4, v.toFixed(1), {"text-anchor": "end"}); }
+  txt(svg, (L + W - R) / 2, H - 10, "Latency per image (ms, log scale)", {"text-anchor": "middle"});
+  txt(svg, 16, (T + H - B) / 2, parMetric === "map50" ? "mAP.5" : parMetric === "map75" ? "mAP.75" : "mAP.5:.95", {transform: `rotate(-90 16 ${(T + H - B) / 2})`, "text-anchor": "middle"});
+  const pts = MODELS.slice().sort((a, b) => a.lat - b.lat);
+  let best = -1; const front = [];
+  pts.forEach(m => { if (m[parMetric] > best) { best = m[parMetric]; front.push(m); } });
+  el("polyline", {points: front.map(m => `${lx(m.lat)},${y(m[parMetric])}`).join(" "), fill: "none", stroke: "var(--ink)", "stroke-width": 2}, svg);
+  const labelled = new Set(front.map(m => m.name).concat(["SAM3", "YOLO-W-S", "YOLOE-X"]));
+  const off = {"OWLv2-B": [-8, -12, "end"], "OmDet-T": [10, 4, "start"], "YOLO-W-S": [10, 14, "start"], "YOLOE-X": [10, 4, "start"], "OWL-ViT": [-10, -10, "end"], "SAM3": [10, 16, "start"], "SAM3-Lite": [-12, -8, "end"], "OWLv2-L": [0, -14, "middle"], "YOLO-W-X": [-10, -10, "end"]};
+  MODELS.forEach(m => {
+    const cx = lx(m.lat), cy = y(m[parMetric]), onF = front.includes(m);
+    const node = marker(svg, m.fam, cx, cy, onF ? 7 : 5.5, {fill: onF ? "var(--ink)" : "var(--raised)", stroke: "var(--ink)", "stroke-width": 1.8});
+    bindTip(node, modelTip(m) + (onF ? "<br><i>On the Pareto frontier</i>" : ""));
+    if (labelled.has(m.name)) {
+      const [dx, dy, anchor] = off[m.name] || [10, 4, "start"];
+      txt(svg, cx + dx, cy + dy, m.name, {"text-anchor": anchor, class: "lab"});
+    }
+  });
+}
+
+/* ---------------- PCR vs PLC ---------------- */
+function renderPcr() {
+  const box = $("#pcrChart"); box.innerHTML = "";
+  const W = 520, H = 440, L = 52, R = 20, T = 16, B = 48, y0 = 0.7, y1 = 1.01;
+  const svg = el("svg", {viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Prompt-consistent recall against localisation consistency"}, box);
+  const x = v => L + v / 0.9 * (W - L - R), y = v => T + (1 - (v - y0) / (y1 - y0)) * (H - T - B);
+  const g = el("g", {class: "grid"}, svg);
+  [0, .2, .4, .6, .8].forEach(v => { el("line", {x1: x(v), x2: x(v), y1: T, y2: H - B}, g); txt(svg, x(v), H - B + 18, v.toFixed(1), {"text-anchor": "middle"}); });
+  [.7, .8, .9, 1.0].forEach(v => { el("line", {x1: L, x2: W - R, y1: y(v), y2: y(v)}, g); txt(svg, L - 8, y(v) + 4, v.toFixed(1), {"text-anchor": "end"}); });
+  txt(svg, (L + W - R) / 2, H - 8, "PCR.5, targets found under all three phrasings", {"text-anchor": "middle"});
+  txt(svg, 14, (T + H - B) / 2, "PLC", {transform: `rotate(-90 14 ${(T + H - B) / 2})`, "text-anchor": "middle"});
+  el("rect", {x: x(-0.012), y: y(1.008), width: x(0.2) - x(-0.012), height: y(0.95) - y(1.008), fill: "color-mix(in srgb, var(--f-tmpl) 12%, transparent)", rx: 4}, svg);
+  txt(svg, x(0.0), y(0.935), "Stable when found, rarely found", {fill: "var(--f-tmpl)", "font-size": 12.5, "font-weight": 600});
+  txt(svg, x(0.0), y(0.935) + 16, "SAM3 recovers 2.4% of targets", {fill: "var(--f-tmpl)", "font-size": 12});
+  const LAB = {"SAM3-Lite": [-9, 4, "end"], "OWLv2-L": [8, 16, "start"], "LLMDet-L": [9, 4, "start"], "MM-G-D-L": [9, 4, "start"]};
+  MODELS.forEach(m => {
+    const n = marker(svg, m.fam, x(m.pcr), y(m.plc), 5.5, {fill: m.name === "SAM3" ? "var(--f-tmpl)" : "var(--ink)", stroke: "var(--raised)", "stroke-width": 1.2});
+    bindTip(n, modelTip(m));
+    if (LAB[m.name]) { const [dx, dy, a] = LAB[m.name]; txt(svg, x(m.pcr) + dx, y(m.plc) + dy, m.name, {class: "lab", "text-anchor": a}); }
+  });
+}
+
+/* ---------------- tightness bars ---------------- */
+function renderTight() {
+  const box = $("#tightChart"); box.innerHTML = "";
+  const rows = MODELS.filter(m => m.map50 >= 0.1).map(m => ({m, r: m.map5095 / m.map50})).sort((a, b) => b.r - a.r);
+  const W = 520, L = 96, R = 50, T = 8, RH = 26, H = T + rows.length * RH + 30;
+  const svg = el("svg", {viewBox: `0 0 ${W} ${H}`, role: "img", "aria-label": "Share of mAP.5 retained at mAP.5:.95"}, box);
+  const x = v => L + (v - 0.6) / 0.3 * (W - L - R);
+  const g = el("g", {class: "grid"}, svg);
+  [.6, .7, .8, .9].forEach(v => { el("line", {x1: x(v), x2: x(v), y1: T, y2: H - 24}, g); txt(svg, x(v), H - 8, Math.round(v * 100) + "%", {"text-anchor": "middle"}); });
+  rows.forEach(({m, r}, i) => {
+    const yy = T + i * RH;
+    txt(svg, L - 10, yy + RH / 2 + 4, m.name, {"text-anchor": "end", class: "lab"});
+    const bar = el("rect", {x: x(.6), y: yy + 5, width: Math.max(2, x(r) - x(.6)), height: RH - 10, rx: 3, fill: m.name === "SAM3" ? "var(--f-orig)" : "var(--ink-3)"}, svg);
+    txt(svg, x(r) + 6, yy + RH / 2 + 4, (r * 100).toFixed(1) + "%");
+    bindTip(bar, `<b>${esc(m.name)}</b><br>mAP.5 ${f3(m.map50)} to mAP.5:.95 ${f3(m.map5095)}<br>${(r * 100).toFixed(1)}% retained`);
+  });
+  const note = document.createElement("p"); note.className = "caption";
+  note.textContent = "Models under 0.1 mAP.5 are omitted; their ratios are dominated by noise.";
+  box.appendChild(note);
+}
+
+/* ---------------- results table ---------------- */
+const COLS = [
+  ["name", "Model"], ["map50", "mAP.5"], ["map75", "mAP.75"], ["map5095", "mAP.5:.95"], ["lat", "Latency (ms)"],
+  ["cat", "mAP.5 cat."], ["tmpl", "mAP.5 tmpl."], ["dmax", "\u0394max"], ["best", "Best"], ["pcr", "PCR.5"], ["plc", "PLC"],
+];
+const LOWER_BETTER = new Set(["lat", "dmax"]);
+let tSort = {k: "map50", dir: -1};
+function renderTable() {
+  const rows = MODELS.slice().sort((a, b) => {
+    const x = a[tSort.k], y = b[tSort.k];
+    return (typeof x === "string" ? x.localeCompare(y) : x - y) * tSort.dir;
+  });
+  const rank = {};
+  COLS.slice(1).forEach(([k]) => {
+    if (k === "best") return;
+    const s = MODELS.map(m => m[k]).sort((a, b) => LOWER_BETTER.has(k) ? a - b : b - a);
+    rank[k] = [s[0], s[1]];
+  });
+  const cell = (m, k) => {
+    if (k === "name") return `<td class="m">${esc(m.name)}<span class="fam">${m.fam}</span></td>`;
+    if (k === "best") return `<td style="color:${FC[m.best]};font-weight:600">${FL[m.best]}</td>`;
+    const v = m[k], cls = [];
+    if (v === rank[k][0]) cls.push("b1"); else if (v === rank[k][1]) cls.push("b2");
+    if (k === "lat" && v <= RT) cls.push("rt");
+    return `<td class="${cls.join(" ")}">${k === "lat" ? v.toFixed(1) : f3(v)}</td>`;
+  };
+  $("#resTable").innerHTML = `<thead><tr>${COLS.map(([k, l]) =>
+      `<th scope="col" data-k="${k}" tabindex="0"${tSort.k === k ? ` aria-sort="${tSort.dir > 0 ? "ascending" : "descending"}"` : ""}>${l}</th>`).join("")}</tr></thead>
+    <tbody>${rows.map(m => `<tr>${COLS.map(([k]) => cell(m, k)).join("")}</tr>`).join("")}</tbody>`;
+  $$("#resTable th").forEach(th => {
+    const go = () => { const k = th.dataset.k;
+      tSort = tSort.k === k ? {k, dir: -tSort.dir} : {k, dir: (k === "name" || LOWER_BETTER.has(k)) ? 1 : -1}; renderTable(); };
+    th.onclick = go; th.onkeydown = e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); go(); } };
+  });
+}
+
+/* ---------------- gallery + taxonomy ---------------- */
+const SCENES = [
+  {k: "excavation", dom: "Industrial: excavation site", q: ["a worker wearing yellow helmet", "a cone closer to the person wearing black jacket"], alt: "An excavator bucket in a construction pit behind orange barriers, with two workers."},
+  {k: "office", dom: "Indoor: office", q: ["a white monitor near a person wearing black shirt", "a person wearing military short"], alt: "Two people seated at desks with monitors in an open-plan office."},
+  {k: "dog", dom: "Urban scene", q: ["a dog jumping over barrier", "a robot dog"], alt: "A dog leaping over a wooden barrier next to a quadruped robot."},
+  {k: "barrels", dom: "Outdoor: unstructured terrain", q: ["a blue barrel on top of a blue barrel"], alt: "Blue barrels and debris on dark soil in low light."},
+  {k: "bar", dom: "Outdoor: structure close-up", q: ["a metal bar", "shadow cast on wall by rust metal bar"], alt: "A rusty metal bar casting a shadow across a rough concrete wall."},
+  {k: "tabletop", dom: "Indoor: laboratory tabletop", q: ["a globe placed above cabinet", "an object for reading"], alt: "A cluttered lab desk with a globe, bottles, a book and small objects."},
+];
+function renderGallery() {
+  $("#gallery").innerHTML = SCENES.map(s => `
+    <figure class="shot">
+      <button aria-pressed="false" aria-label="Show annotated targets: ${esc(s.dom)}">
+        <img src="${ASSET[s.k + ".jpg"]}" alt="${esc(s.alt)}" loading="lazy" width="720" height="540">
+        <img class="ann" src="${ASSET[s.k + "_ann.jpg"]}" alt="" loading="lazy" width="720" height="540">
+        <span class="toggle">Show targets</span>
+      </button>
+      <figcaption><span class="dom">${esc(s.dom)}</span><span class="qs">${s.q.map(q => "\u201C" + esc(q) + "\u201D").join(", ")}</span></figcaption>
+    </figure>`).join("");
+  $$(".shot button").forEach(b => b.onclick = () => {
+    const on = b.getAttribute("aria-pressed") !== "true";
+    b.setAttribute("aria-pressed", on); b.querySelector(".toggle").textContent = on ? "Show image" : "Show targets";
+  });
+}
+const TAXO = [
+  ["Categorical", "class identity", "a bicycle"],
+  ["Attributive", "intrinsic properties", "a person carrying a red and pink backpack"],
+  ["Relational", "relations to other entities", "a person walking with a bicycle"],
+  ["Affordance", "function or possible action", "an object used for riding"],
+  ["State", "a transient physical or operating condition", "a stationary red backpack"],
+  ["Part-whole", "a constituent or structural relation", "a front wheel of a bicycle"],
+  ["Negative", "explicit exclusion or absence", "an object for riding without a rider"],
+  ["Compositional", "two or more constraints that must hold together", "a person with a pink and red backpack beside a man"],
+];
+function renderTaxo() { $("#taxo").innerHTML = TAXO.map(t => `<tr><td>${t[0]}</td><td>${t[1]}</td><td><q>${esc(t[2])}</q></td></tr>`).join(""); }
+
+/* ---------------- demo video ---------------- */
+function setupVideo() {
+  if (!LINKS.video) return;
+  const v = $("#demoVideo");
+  v.src = LINKS.video; v.hidden = false; $("#videoFallback").hidden = true;
+  v.onerror = () => { v.hidden = true; $("#videoFallback").hidden = false; };
+}
+
+/* ---------------- misc ---------------- */
+function setupCopy() {
+  $("#copyBib").onclick = async () => {
+    const t = $("#bib").textContent, b = $("#copyBib");
+    try { await navigator.clipboard.writeText(t); b.textContent = "Copied"; }
+    catch { const r = document.createRange(); r.selectNodeContents($("#bib")); const s = getSelection(); s.removeAllRanges(); s.addRange(r); b.textContent = "Selected, press Ctrl+C"; }
+    setTimeout(() => b.textContent = "Copy BibTeX", 2200);
+  };
+}
+function setupTheme() {
+  const root = document.documentElement, btn = $("#themeBtn");
+  let stored = null; try { stored = localStorage.getItem("pb-theme"); } catch {}
+  if (stored) root.dataset.theme = stored;
+  const isDark = () => root.dataset.theme ? root.dataset.theme === "dark" : matchMedia("(prefers-color-scheme: dark)").matches;
+  const sync = () => btn.textContent = isDark() ? "Light mode" : "Dark mode";
+  btn.onclick = () => { root.dataset.theme = isDark() ? "light" : "dark"; try { localStorage.setItem("pb-theme", root.dataset.theme); } catch {} sync(); };
+  sync();
+}
+function setupNav() {
+  const links = $$(".nav a.sec"), secs = links.map(a => document.querySelector(a.getAttribute("href")));
+  const obs = new IntersectionObserver(es => {
+    es.forEach(e => { if (e.isIntersecting) links.forEach(a => a.setAttribute("aria-current", a.getAttribute("href") === "#" + e.target.id)); });
+  }, {rootMargin: "-45% 0px -50% 0px"});
+  secs.forEach(s => s && obs.observe(s));
+}
+function segBind(sel, attr, fn) {
+  $$(sel + " button").forEach(b => b.onclick = () => {
+    $$(sel + " button").forEach(x => x.setAttribute("aria-pressed", x === b)); fn(b.dataset[attr]);
+  });
+}
+
+renderLinks(); renderHero(); renderSens(); renderPareto(); renderPcr(); renderTight(); renderTable();
+renderGallery(); renderTaxo(); setupVideo(); setupCopy(); setupTheme(); setupNav();
+segBind("#sensSort", "s", v => { sensSort = v; renderSens(); });
+segBind("#parMetric", "m", v => { parMetric = v; renderPareto(); });
+</script>
+</body>
+</html>
