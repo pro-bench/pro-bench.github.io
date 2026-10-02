@@ -509,19 +509,15 @@ python demo_server.py --config configs/benchmark.yaml \
 <script>
 "use strict";
 const ASSET = {"bar.jpg": "assets/bar.jpg", "bar_ann.jpg": "assets/bar_ann.jpg", "barrels.jpg": "assets/barrels.jpg", "barrels_ann.jpg": "assets/barrels_ann.jpg", "dog.jpg": "assets/dog.jpg", "dog_ann.jpg": "assets/dog_ann.jpg", "excavation.jpg": "assets/excavation.jpg", "excavation_ann.jpg": "assets/excavation_ann.jpg", "fig2_pipeline.jpg": "assets/fig2_pipeline.jpg", "fig6_qualitative.jpg": "assets/fig6_qualitative.jpg", "office.jpg": "assets/office.jpg", "office_ann.jpg": "assets/office_ann.jpg", "og.jpg": "assets/og.jpg", "tabletop.jpg": "assets/tabletop.jpg", "tabletop_ann.jpg": "assets/tabletop_ann.jpg", "tunnel.jpg": "assets/tunnel.jpg", "tunnel_target.png": "assets/tunnel_target.png"};
-/* ------------------------------------------------------------------
-   Edit these links when the release is public. Empty links render as
-   "coming soon" and are not clickable.
------------------------------------------------------------------- */
+
 const LINKS = {
-  paper:   "https://arxiv.org/abs/2609.27076",   // e.g. https://arxiv.org/abs/2609.xxxxx
-  pdf:     "",
-  code:    "",   // e.g. https://github.com/<org>/pro-bench
-  dataset: "",   // e.g. https://huggingface.co/datasets/<org>/pro-bench
-  video:   "",   // e.g. assets/demo.mp4 or a hosted MP4
+  paper:   "",   
+  arXiv:  "https://arxiv.org/abs/2609.27076",
+  code:    "",  
+  dataset: "",   
+  video:   "",   
 };
 
-/* Table II of the paper. */
 const MODELS = [
  ["SAM3-Lite","Segmentation",.696,.594,.562,683.0,.737,.541,.196,"cat",.847,.917],
  ["OWLv2-L","Transformer",.567,.477,.443,244.8,.540,.569,.029,"tmpl",.482,.994],
@@ -558,7 +554,7 @@ const ICON = {
 };
 function renderLinks() {
   const items = [
-    {label:"Paper", href:LINKS.paper || LINKS.pdf, icon:ICON.paper, primary:true},
+    {label:"Paper", href:LINKS.paper || LINKS.arXiv, icon:ICON.paper, primary:true},
     {label:"Code", href:LINKS.code, icon:ICON.code},
     {label:"Dataset", href:LINKS.dataset, icon:ICON.data},
     {label:"Live demo", href:"#demo", icon:ICON.demo},
