@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pro-Bench: Prompt-Robust Open-Vocabulary Visual Grounding</title>
-<meta name="description" content="Pro-Bench tests whether open-vocabulary models find the same target however an operator phrases the request: 13k+ real robot frames, 74.5k instances, 515 queries, 16 models.">
+<meta name="description" content="Pro-Bench investigates whether open-vocabulary models locate the same target however an operator phrases the request: 13k+ real robot frames, 74.5k instances, 515 queries, 16 models.">
 <meta property="og:title" content="Pro-Bench: Prompt-Robust Open-Vocabulary Visual Grounding">
 <meta property="og:description" content="Same target, three phrasings, sixteen models. A benchmark for prompt robustness in real robot deployments.">
 <meta property="og:type" content="website">
@@ -52,8 +52,8 @@ a{color:var(--f-orig);text-underline-offset:3px}
 h1,h2,h3{margin:0;line-height:1.15}
 h2{font:700 40px/1.05 var(--cond);letter-spacing:-.005em;margin-bottom:14px}
 h3{font-size:19px;font-weight:600}
-p{margin:0 0 1em;max-width:68ch}
-.lede{font-size:19px;color:var(--ink-2);max-width:62ch}
+p{margin:0 0 1em;max-width:none}
+.lede{font-size:19px;color:var(--ink-2);max-width:none}
 section{padding:84px 0 0}
 .muted{color:var(--ink-3)}
 .fo{color:var(--f-orig)} .fc{color:var(--f-cat)} .ft{color:var(--f-tmpl)}
@@ -119,7 +119,7 @@ section{padding:84px 0 0}
 .findings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 40px;margin:28px 0 8px}
 .finding{border-top:2px solid var(--ink);padding-top:12px}
 .finding h3{margin-bottom:6px}
-.finding p{color:var(--ink-2);font-size:16px;margin:0}
+.finding p{color:var(--ink-2);font-size:16px;margin:none}
 .panel{background:var(--raised);border:1px solid var(--rule);border-radius:var(--r);padding:22px 24px;margin-top:28px}
 .panel-head{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 24px;margin-bottom:14px}
 .panel-head h3{font-size:20px}
@@ -170,7 +170,7 @@ table{border-collapse:collapse;width:100%;font-size:15px}
 .taxo q{quotes:"\201C" "\201D"}
 figure.fig{margin:48px 0 0}
 figure.fig .imgbox{background:#fff;border:1px solid var(--rule);border-radius:var(--r);padding:12px;overflow:hidden}
-figure.fig figcaption{font-size:14.5px;color:var(--ink-3);margin-top:10px;max-width:90ch}
+figure.fig figcaption{font-size:14.5px;color:var(--ink-3);margin-top:10px;max-width:none}
 
 /* ---------- protocol ---------- */
 .forms3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin:24px 0 36px}
@@ -301,8 +301,9 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
       <p>We benchmarked 16 open-vocabulary model configurations in strict zero-shot inference, measuring localisation accuracy across IoU thresholds, end-to-end inference latency, prompt-induced performance variation, and target recovery consistency. Our results show that prompt-robustness is strongly architecture-dependent. Most model configurations (10/16) perform best with short category labels, whereas free-form queries yield the highest accuracy for only one. Moreover, similar aggregate mAP can conceal substantial differences in consistent target recovery across reformulations. Pro-Bench enables systematic evaluation of these gaps and supports prompt-robust visual grounding.</p>
     </div>
     <dl class="facts" aria-label="Benchmark at a glance">
+      <h2>Benchmark at a glance</h2>
       <div><dt>13k+</dt><dd>RGB frames captured by real robots, no web or synthetic imagery</dd></div>
-      <div><dt>74.5k</dt><dd>hand-drawn polygon instances, boxes and masks in COCO format</dd></div>
+      <div><dt>74.5k</dt><dd>human-annotated polygon-based instances, boxes and masks in COCO format</dd></div>
       <div><dt>515</dt><dd>operator-style queries, each with three target-preserving formulations</dd></div>
       <div><dt>8</dt><dd>semantic prompt types, from categorical to compositional</dd></div>
       <div><dt>16</dt><dd>model configurations, evaluated strictly zero-shot on one RTX 4090</dd></div>
@@ -312,8 +313,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
 
 <section id="findings">
   <div class="wrap">
-    <h2>What the benchmark found</h2>
-    <p class="lede">An operator can ask for the same object in several ways. Most current models reward the shortest phrasing, and some break on harmless rewording.</p>
+    <h2>What Pro-Bench found</h2>
+    <p class="lede">An operator can refer to the same object in several ways. Most current open-vocabulary models performed exceptionally well with the shortest phrasing, and some break on harmless rewording.</p>
     <div class="findings">
       <div class="finding"><h3>Short labels still win</h3><p>10 of 16 configurations score highest with the categorical label, 5 with the template form, and only YOLOE-X with the operator's free-form query.</p></div>
       <div class="finding"><h3>A template can break a model</h3><p>Prefixing "a photo of" drops SAM3 from 0.417 to 0.044 mAP.5, while G-DINO-T gains 0.069 from the same change.</p></div>
@@ -334,7 +335,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
         </div>
       </div>
       <div class="chart" id="sensChart"></div>
-      <p class="caption">Best formulation across the 16 configurations:</p>
+      <p class="caption">Best formulation across the 16 model configurations:</p>
       <div class="tally" id="tally" aria-label="Best formulation counts"></div>
     </div>
   </div>
@@ -343,38 +344,38 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
 <section id="benchmark">
   <div class="wrap">
     <h2>The benchmark</h2>
-    <p class="lede">Frames come from real robot sensors in five kinds of environment, so the models face low light, occlusion, odd viewpoints and domain-specific objects. Select a scene to see its annotated targets.</p>
+    <p class="lede">RGB frames are curated from real robot sensors in five heterogeneous environments, enabling the models to face low light, occlusion, odd viewpoints and domain-specific objects characteristic of real-world scenarios. Click on a scene below to see the target annotations.</p>
     <div class="gallery" id="gallery"></div>
 
     <div class="cols">
       <div>
-        <h3 style="margin-bottom:14px">Where the frames come from</h3>
+        <h3 style="margin-bottom:14px">Where the data come from:</h3>
         <dl class="sources">
-          <div><dt>Subterranean and industrial</dt><dd>Tunnels, quarries, mines and excavation sites from DARPA SubT, EnvoDat, Hilti-SLAM and GOOSE-Ex.</dd></div>
-          <div><dt>Outdoor and urban</dt><dd>Forest trails, unstructured terrain and street scenes from EnvoDat, GOOSE-Ex, KITTI, MCD and our own campus recordings.</dd></div>
-          <div><dt>Indoor and laboratory</dt><dd>Offices, labs and tabletops with clutter and look-alike objects, from TUM RGB-D, EnvoDat and in-house scenes.</dd></div>
-          <div><dt>Annotation</dt><dd>Seven annotators drew fine polygon boundaries for common and uncommon objects, and a separate reviewer checked every annotation against its query. Object sizes: 51.3% large, 28.4% medium, 20.3% small; median mask area is 2.5% of the image.</dd></div>
+          <div><dt>1) Subterranean and industrial</dt><dd>Tunnels, quarries, mines and excavation sites from DARPA SubT, EnvoDat, Hilti-SLAM and GOOSE-Ex.</dd></div>
+          <div><dt>2) Outdoor and urban</dt><dd>Forest trails, unstructured terrain and street scenes from EnvoDat, GOOSE-Ex, KITTI, MCD and our own campus recordings.</dd></div>
+          <div><dt>3) Indoor and laboratory</dt><dd>Offices, labs and tabletops with clutter and look-alike objects, from TUM RGB-D, EnvoDat and in-house scenes.</dd></div>
+        <h3 style="margin-bottom:8px">Data Annotation:</h3>
+        <p>Each RGB frame is annotated with a free-form query and at least one semantic type, from which the categorical and template-wrapped variants are derived. Seven annotators contributed fine polygon boundaries for common and uncommon objects, and a separate reviewer checked every annotation against its query. Object sizes: 51.3% large, 28.4% medium, 20.3% small; median mask area is 2.5% of the image.</p> 
         </dl>
       </div>
       <div>
-        <h3 style="margin-bottom:8px">Eight kinds of query</h3>
+        <h3 style="margin-bottom:8px">Eight semantic prompt types:</h3>
         <table class="taxo">
           <thead><tr><th>Type</th><th>Identifies the target by</th><th>Example</th></tr></thead>
           <tbody id="taxo"></tbody>
         </table>
       </div>
     </div>
-
     <figure class="fig">
-      <div class="imgbox"><img src="assets/fig2_pipeline.jpg" alt="Pro-Bench construction pipeline: multi-domain scenes, human annotation of target instances, prompt construction with eight semantic types and three formulations, and dataset statistics." loading="lazy" width="1800" height="684"></div>
-      <figcaption>Construction pipeline and dataset statistics. Each target gets a human-written free-form query and at least one semantic type, from which the categorical and template-wrapped variants are derived.</figcaption>
+      <div class="imgbox"><img src="assets/fig2_pipeline.jpg" alt="Pro-Bench construction pipeline: multi-domain scenes, human annotation of target instances, prompt construction with eight semantic types and three formulations, and dataset statistics." loading="lazy" width="1500" height="500"></div>
+      <figcaption>Pro-Bench construction pipeline and dataset statistics. Given the RGB frames curated from multidomain robotic datasets that depict realistic robot operating scenarios (1), we provide annotations for task-relevant targets with fine-grained polygon-based masks (2). Each target is associated with a human-defined free-form query and at least one semantic prompt category, from which we derive the categorical and template-wrapped variants for prompt-sensitivity evaluation (3). The final panel (4) summarises the resulting Pro-Bench dataset statistics</figcaption>
     </figure>
   </div>
 </section>
 
 <section id="protocol">
   <div class="wrap">
-    <h2>Measuring prompt robustness</h2>
+    <h2>Prompt robustness quantification</h2>
     <p class="lede">Every target is queried three ways. Each formulation keeps the same referent, so a robust model should find the same object every time.</p>
     <div class="forms3">
       <div class="form3" style="border-top-color:var(--f-orig)"><h3 class="fo">Original <span class="muted">p<sup>orig</sup></span></h3>
@@ -407,7 +408,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
 <section id="results">
   <div class="wrap">
     <h2>Results</h2>
-    <p class="lede">All 16 configurations run zero-shot with frozen public weights and each model's own prompt interface. Latency is end-to-end on one RTX 4090, after three warm-up passes.</p>
+    <p class="lede">All the 16 model configurations are evaluated in strict zero-shot with frozen public weights and each model's own prompt interface. Latency is end-to-end on RTX 4090, after three warm-up passes.</p>
 
     <div class="panel">
       <div class="panel-head">
@@ -446,7 +447,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
     <h2>Qualitative examples</h2>
     <p class="lede">A model can find the right region yet box it far too loosely, or miss a target that is plainly visible when the query describes it indirectly. No representative model returns a valid box for "an object suitable for sensor calibration", although the calibration board fills the frame.</p>
     <figure class="fig" style="margin-top:24px">
-      <div class="imgbox"><img src="assets/fig6_qualitative.jpg" alt="Grid of seven scenes. Rows show the original image, the target queries with ground-truth boxes, and top-confidence predictions from YOLO-World-X, YOLOE-X, SAM 3 and OWLv2-L." loading="lazy" width="1800" height="1162"></div>
+      <div class="imgbox"><img src="assets/fig6_qualitative.jpg" alt="Grid of seven scenes. Rows show the original image, the target queries with ground-truth boxes, and top-confidence predictions from YOLO-World-X, YOLOE-X, SAM 3 and OWLv2-L." loading="lazy" width="1800" height="900"></div>
       <figcaption>Top-confidence prediction per query for four representative models: real-time detection (YOLO-W-X, YOLOE-X), open-vocabulary segmentation (SAM3) and a transformer detector (OWLv2-L).</figcaption>
     </figure>
   </div>
@@ -455,7 +456,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
 <section id="demo">
   <div class="wrap">
     <h2>Live demo</h2>
-    <p class="lede">The demo runs all 16 configurations side by side on your own images or a live camera, including RealSense depth, and shows the prompt-robustness protocol on a single scene.</p>
+    <p class="lede">The demo runs all the 16 model configurations side by side on your own images or a live camera, including RealSense depth, and shows the prompt-robustness protocol on a single scene.</p>
     <div class="demo">
       <div class="video" id="videoBox">
         <video id="demoVideo" controls playsinline preload="metadata" poster="" hidden></video>
@@ -513,7 +514,7 @@ const ASSET = {"bar.jpg": "assets/bar.jpg", "bar_ann.jpg": "assets/bar_ann.jpg",
    "coming soon" and are not clickable.
 ------------------------------------------------------------------ */
 const LINKS = {
-  paper:   "",   // e.g. https://arxiv.org/abs/2609.xxxxx
+  paper:   "https://arxiv.org/abs/2609.27076",   // e.g. https://arxiv.org/abs/2609.xxxxx
   pdf:     "",
   code:    "",   // e.g. https://github.com/<org>/pro-bench
   dataset: "",   // e.g. https://huggingface.co/datasets/<org>/pro-bench
@@ -781,7 +782,7 @@ function renderTable() {
 /* ---------------- gallery + taxonomy ---------------- */
 const SCENES = [
   {k: "excavation", dom: "Industrial: excavation site", q: ["a worker wearing yellow helmet", "a cone closer to the person wearing black jacket"], alt: "An excavator bucket in a construction pit behind orange barriers, with two workers."},
-  {k: "office", dom: "Indoor: office", q: ["a white monitor near a person wearing black shirt", "a person wearing military short"], alt: "Two people seated at desks with monitors in an open-plan office."},
+  {k: "office", dom: "Indoor: office", q: ["a white monitor near a person wearing black shirt", "a person wearing military short", "..."], alt: "Two people seated at desks with monitors in an open-plan office."},
   {k: "dog", dom: "Urban scene", q: ["a dog jumping over barrier", "a robot dog"], alt: "A dog leaping over a wooden barrier next to a quadruped robot."},
   {k: "barrels", dom: "Outdoor: unstructured terrain", q: ["a blue barrel on top of a blue barrel"], alt: "Blue barrels and debris on dark soil in low light."},
   {k: "bar", dom: "Outdoor: structure close-up", q: ["a metal bar", "shadow cast on wall by rust metal bar"], alt: "A rusty metal bar casting a shadow across a rough concrete wall."},
