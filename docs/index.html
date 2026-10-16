@@ -302,11 +302,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
     </div>
     <dl class="facts" aria-label="Benchmark at a glance">
       <h2>Pro-Bench at a glance</h2>
-      <div><dt>13k+</dt><dd>RGB frames captured by real robots, no web or synthetic imagery</dd></div>
-      <div><dt>74.5k</dt><dd>human-annotated polygon-based instances, boxes and masks in COCO format</dd></div>
+      <div><dt>13k+</dt><dd>RGB frames from independent robotic domains (subterranean, industrial, indoor, outdoor, urban), no web or synthethic imagery</dd></div>
+      <div><dt>74.5k</dt><dd>human-annotated polygon-based instances, boxes and masks in multiple formats, e.g., COCO, suitable for benchmarking visual reasoning models</dd></div>
       <div><dt>515</dt><dd>operator-style queries, each with three target-preserving formulations</dd></div>
       <div><dt>8</dt><dd>semantic prompt types, from categorical to compositional</dd></div>
-      <div><dt>16</dt><dd>model configurations, evaluated strictly zero-shot on one RTX 4090</dd></div>
+      <div><dt>16</dt><dd>open-vocabulary model configurations, evaluated strictly zero-shot on an RTX 4090</dd></div>
     </dl>
   </div>
 </section>
@@ -314,7 +314,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
 <section id="findings">
   <div class="wrap">
     <h2>What Pro-Bench found</h2>
-    <p class="lede">An operator can refer to the same object in several ways. Most current open-vocabulary models performed exceptionally well with the shortest phrasing, and some break on harmless rewording.</p>
+    <p class="lede">An operator can refer to the same object in several ways. Most current open-vocabulary models performed exceptionally well with atomic or short categorical phrasing, and some break on harmless rewording.</p>
     <div class="findings">
       <div class="finding"><h3>Short labels still win</h3><p>10 of 16 configurations score highest with the categorical label, 5 with the template form, and only YOLOE-X with the operator's free-form query.</p></div>
       <div class="finding"><h3>A template can break a model</h3><p>Prefixing "a photo of" drops SAM3 from 0.417 to 0.044 mAP.5, while G-DINO-T gains 0.069 from the same change.</p></div>
