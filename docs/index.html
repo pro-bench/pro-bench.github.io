@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Pro-Bench: Prompt-Robust Open-Vocabulary Visual Grounding</title>
-<meta name="description" content="Pro-Bench investigates whether open-vocabulary models locate the same target however an operator phrases the request: 13k+ real robot frames, 74.5k instances, 515 queries, 16 models.">
+<meta name="description" content="Pro-Bench tests whether open-vocabulary models find the same target however an operator phrases the request: 13k+ real robot frames, 74.5k instances, 515 queries, 16 models.">
 <meta property="og:title" content="Pro-Bench: Prompt-Robust Open-Vocabulary Visual Grounding">
 <meta property="og:description" content="Same target, three phrasings, sixteen models. A benchmark for prompt robustness in real robot deployments.">
 <meta property="og:type" content="website">
@@ -42,6 +42,7 @@
   --band:#0E151B; --f-orig:#8AA8FF; --f-cat:#3FCFD0; --f-tmpl:#FF74BC;
 }
 *,*::before,*::after{box-sizing:inherit}
+[hidden]{display:none!important}
 html{scroll-padding-top:calc(64px + env(safe-area-inset-top,0px));scroll-behavior:smooth}
 body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 var(--sans);-webkit-font-smoothing:antialiased;
   font-variant-numeric:tabular-nums}
@@ -119,7 +120,7 @@ section{padding:84px 0 0}
 .findings{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px 40px;margin:28px 0 8px}
 .finding{border-top:2px solid var(--ink);padding-top:12px}
 .finding h3{margin-bottom:6px}
-.finding p{color:var(--ink-2);font-size:16px;margin:none}
+.finding p{color:var(--ink-2);font-size:16px;margin:0}
 .panel{background:var(--raised);border:1px solid var(--rule);border-radius:var(--r);padding:22px 24px;margin-top:28px}
 .panel-head{display:flex;flex-wrap:wrap;align-items:flex-end;gap:12px 24px;margin-bottom:14px}
 .panel-head h3{font-size:20px}
@@ -147,6 +148,143 @@ section{padding:84px 0 0}
 .tally{display:flex;height:34px;border-radius:5px;overflow:hidden;margin:6px 0 6px;max-width:560px}
 .tally div{display:flex;align-items:center;padding:0 10px;color:#fff;font-weight:600;font-size:14px;white-space:nowrap}
 
+/* ---------- try it yourself ---------- */
+.livewake,.livepanel{background:var(--raised);border:1px solid var(--rule);border-radius:var(--r);margin-top:18px}
+.livewake{padding:14px 20px;font-size:15px;color:var(--ink-2);border-left:4px solid var(--rule)}
+.livewake b{color:var(--ink)}
+.livehead{padding:15px 20px 0}
+.livehead h3{font-size:18px}
+.livehead p{margin:4px 0 0;font-size:14px;color:var(--ink-3)}
+.livegrid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:20px;padding:14px 20px 18px}
+.liverow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.liverow.small{margin-top:8px;font-size:13px;color:var(--ink-3)}
+.liverow.small button{margin-left:auto}
+.btnfile,.btnq{border:1px solid var(--rule);background:var(--bg);border-radius:5px;padding:6px 12px;
+  font:inherit;font-size:14px;cursor:pointer;color:var(--ink)}
+.btnfile:hover,.btnq:hover{border-color:var(--ink-3)}
+.btnfile input{position:absolute;opacity:0;width:1px;height:1px}
+#liveVideo{width:100%;max-height:300px;border-radius:5px;background:#0B1116;margin-top:10px;display:block}
+.liveprev{position:relative;margin-top:10px;background:#0B1116;border-radius:5px;aspect-ratio:4/3;overflow:hidden}
+.liveprev canvas{position:absolute;inset:0;width:100%;height:100%;cursor:crosshair;touch-action:none}
+.liveform{display:grid;gap:10px;align-content:start}
+.lf{display:grid;gap:4px;font-size:13.5px;color:var(--ink-2)}
+.lf input{border:1px solid var(--rule);border-radius:5px;background:var(--bg);color:var(--ink);
+  padding:8px 10px;font:inherit;font-size:15px}
+.liveform .small{margin:0;font-size:12.5px;color:var(--ink-3);line-height:1.4}
+.btnrun{background:var(--hivis);border:1px solid var(--hivis-deep);color:#16202A;font-weight:700;
+  border-radius:5px;padding:10px 14px;font:inherit;font-size:15px;font-weight:700;cursor:pointer}
+.btnrun:hover{background:#FFD21A}
+.btnrun:disabled{opacity:.55;cursor:wait}
+.livestatus{margin:0;font-size:13.5px;color:var(--ink-2);min-height:1.2em}
+.livestatus.bad{color:var(--err)}
+@media (max-width:860px){.livegrid{grid-template-columns:1fr}}
+.howto{background:var(--raised);border:1px solid var(--rule);border-radius:var(--r);margin-top:22px;padding:0}
+.howto summary{cursor:pointer;padding:14px 20px;font-weight:600;font-size:16px;list-style:none;display:flex;align-items:center;gap:10px}
+.howto summary::-webkit-details-marker{display:none}
+.howto summary::before{content:"";width:7px;height:7px;border-right:2px solid var(--ink-3);border-bottom:2px solid var(--ink-3);
+  transform:rotate(-45deg);transition:transform .15s;flex:none;margin-left:2px}
+.howto[open] summary::before{transform:rotate(45deg)}
+.howto ol{margin:0;padding:0 20px 18px 20px;list-style:none;counter-reset:ht;
+  display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px 26px}
+.howto li{counter-increment:ht;display:grid;grid-template-columns:24px 1fr;gap:10px;font-size:15px;color:var(--ink-2);line-height:1.45}
+.howto li::before{content:counter(ht);width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--bg);
+  display:grid;place-items:center;font:700 13px/1 var(--cond)}
+.howto b{color:var(--ink);font-weight:600}
+.runlink{font-size:15px;color:var(--ink-2);margin:16px 0 0}
+.runblock{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:32px;
+  margin-top:22px;align-items:start}
+.runblock .rbvid{background:#0B1116;border-radius:var(--r);overflow:hidden;aspect-ratio:1918/886;
+  display:grid;place-items:center;min-width:0}
+.runblock .rbvid video{width:100%;height:100%;object-fit:contain;background:#000}
+.runblock .rbvid .rbfall{padding:26px;color:#A9B4BD;text-align:center;font-size:15px;max-width:44ch}
+.runblock .rbvid .rbfall b{display:block;color:#fff;font-size:18px;margin-bottom:6px}
+.rbcap{font-size:13.5px;color:var(--ink-3);margin:8px 0 0}
+.runsteps h3{font-size:18px;margin-bottom:4px}
+.runsteps > p{font-size:15px;color:var(--ink-2);margin:0 0 14px}
+.runsteps ol{margin:0;padding:0;list-style:none;counter-reset:rs;display:grid;gap:13px}
+.runsteps li{counter-increment:rs;display:grid;grid-template-columns:24px 1fr;gap:11px;
+  font-size:15px;color:var(--ink-2);line-height:1.45}
+.runsteps li::before{content:counter(rs);width:22px;height:22px;border-radius:50%;
+  background:var(--ink);color:var(--bg);display:grid;place-items:center;font:700 13px/1 var(--cond);margin-top:2px}
+.runsteps li b{color:var(--ink);font-weight:600}
+.runsteps pre{margin:9px 0 0;font-size:13px;padding:11px 13px}
+.runsteps .req{margin:16px 0 0;font-size:13.5px;color:var(--ink-3)}
+@media (max-width:860px){.runblock{grid-template-columns:1fr}}
+.tryban{background:var(--raised);border:1px solid var(--rule);border-left:4px solid var(--hivis-deep);
+  border-radius:var(--r);padding:16px 20px;margin:22px 0 0;font-size:15.5px;color:var(--ink-2)}
+.tryban b{color:var(--ink);display:block;margin-bottom:4px;font-size:16px}
+.tryban code{font:13.5px/1.5 var(--mono);background:var(--bg);padding:2px 6px;border-radius:4px;display:inline-block}
+.try{display:grid;grid-template-columns:312px minmax(0,1fr);gap:26px;margin-top:24px;align-items:start}
+.tryside{background:var(--raised);border:1px solid var(--rule);border-radius:var(--r);padding:18px 18px 20px;
+  position:sticky;top:76px;display:grid;gap:18px}
+.trystep h3{font-size:14px;display:flex;align-items:center;gap:9px;margin-bottom:9px}
+.trystep h3 .n{width:20px;height:20px;border-radius:50%;background:var(--ink);color:var(--bg);
+  display:inline-grid;place-items:center;font:700 12px/1 var(--cond)}
+.trystep h3 .side{margin-left:auto;font-weight:400;color:var(--ink-3);font-size:13px}
+.scenes{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.scenes button{padding:0;border:2px solid transparent;border-radius:5px;overflow:hidden;background:#0B1116;
+  aspect-ratio:4/3;cursor:pointer}
+.scenes button[aria-pressed="true"]{border-color:var(--hivis-deep)}
+.scenes img{width:100%;height:100%;object-fit:cover;display:block}
+.qlist{display:grid;gap:5px;max-height:188px;overflow-y:auto}
+.qlist button{text-align:left;border:1px solid var(--rule-2);background:var(--bg);border-radius:5px;
+  padding:7px 10px;cursor:pointer;font:inherit;font-size:14px;color:var(--ink);line-height:1.3}
+.qlist button:hover{border-color:var(--ink-3)}
+.qlist button[aria-pressed="true"]{border-color:var(--ink);background:var(--raised);box-shadow:inset 3px 0 0 var(--hivis-deep)}
+.qlist .qt{display:block;color:var(--ink-3);font-size:12px;margin-top:2px}
+.tryseg{display:flex;border:1px solid var(--rule);border-radius:5px;overflow:hidden}
+.tryseg button{flex:1;border:0;background:var(--raised);color:var(--ink-2);padding:6px 4px;font:inherit;font-size:13.5px;cursor:pointer}
+.tryseg button+button{border-left:1px solid var(--rule)}
+.tryseg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.mlist{display:grid;gap:3px;max-height:210px;overflow-y:auto;font-size:14px}
+.mlist label{display:grid;grid-template-columns:16px 1fr auto;gap:8px;align-items:center;cursor:pointer}
+.mlist .nm{font:600 15px/1.2 var(--cond)}
+.mlist .num{color:var(--ink-3);font-size:12.5px}
+.mquick{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.mquick button{border:1px solid var(--rule);background:var(--bg);border-radius:4px;padding:3px 9px;
+  font:inherit;font-size:13px;cursor:pointer;color:var(--ink-2)}
+.mquick button:hover{border-color:var(--ink-3)}
+.tryrange{display:flex;align-items:center;gap:10px;font-size:13.5px;color:var(--ink-2)}
+.tryrange input{flex:1;accent-color:var(--ink)}
+
+.askedbar{background:var(--raised);border:1px solid var(--rule);border-radius:var(--r);padding:14px 16px;
+  display:grid;gap:7px;margin-bottom:16px}
+.asked{display:grid;grid-template-columns:4px 92px minmax(0,1fr) auto;gap:12px;align-items:center;font-size:15px}
+.asked .sw{height:16px;border-radius:2px}
+.asked .lb{font-weight:600;font-size:13.5px}
+.asked q{quotes:"\201C" "\201D";overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.asked .cnt{font-size:13px;color:var(--ink-3);white-space:nowrap}
+.asked.dim{opacity:.4}
+.trygrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(248px,1fr));gap:13px}
+.tcard{background:var(--raised);border:1px solid var(--rule);border-radius:var(--r);overflow:hidden}
+.tcard.fail{border-color:var(--err)}
+.tchead{display:flex;align-items:baseline;gap:7px;padding:8px 11px 7px}
+.tchead h4{font:700 17px/1.1 var(--cond);margin:0}
+.tchead .fam{font-size:11.5px;color:var(--ink-3)}
+.tchead .lat{margin-left:auto;font-size:12px;color:var(--ink-3)}
+.tcwell{position:relative;background:#0B1116;aspect-ratio:4/3}
+.tcwell canvas{position:absolute;inset:0;width:100%;height:100%}
+.tcwell .none{position:absolute;inset:auto 0 0 0;padding:6px 10px;font-size:12.5px;color:#D7DEE3;background:rgba(11,17,22,.75)}
+.tcfoot{display:grid;gap:3px;padding:8px 11px 10px;font-size:13px;border-top:1px solid var(--rule-2)}
+.tcrow{display:grid;grid-template-columns:4px 78px 1fr auto;gap:8px;align-items:center}
+.tcrow .sw{height:12px;border-radius:2px}
+.tcrow .lb{font-weight:600}
+.tcrow .v{color:var(--ink-2)}
+.ok{color:var(--ok);font-weight:600}
+.no{color:var(--err);font-weight:600}
+.verdict{display:flex;justify-content:space-between;gap:10px;padding-top:3px;border-top:1px dotted var(--rule-2);
+  margin-top:2px;color:var(--ink-2)}
+.verdict b{color:var(--ink)}
+.tryfoot{margin-top:18px;display:flex;flex-wrap:wrap;gap:10px 24px;align-items:baseline;
+  font-size:15px;color:var(--ink-2)}
+.tryfoot b{color:var(--ink)}
+.tryfoot .sep{color:var(--rule)}
+@media (max-width:960px){
+  .try{grid-template-columns:1fr}
+  .tryside{position:static}
+}
+.btnlink{margin-left:auto;border:0;background:none;color:var(--f-orig);font:inherit;font-size:13px;
+  cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:3px}
 /* ---------- benchmark ---------- */
 .gallery{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:26px}
 .shot{margin:0;background:var(--raised);border:1px solid var(--rule);border-radius:var(--r);overflow:hidden}
@@ -203,8 +341,15 @@ figure.fig figcaption{font-size:14.5px;color:var(--ink-3);margin-top:10px;max-wi
 .two .chart svg{min-width:0}
 
 /* ---------- demo ---------- */
-.demo{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,5fr);gap:40px;align-items:start;margin-top:24px}
-.video{background:#0B1116;border-radius:var(--r);overflow:hidden;aspect-ratio:16/10;display:grid;place-items:center;color:#A9B4BD;text-align:center}
+.demo{display:grid;grid-template-columns:minmax(0,8fr) minmax(0,5fr);gap:36px;align-items:start;margin-top:24px}
+.vidcol{min-width:0}
+.vidtabs{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
+.vidtabs button{border:1px solid var(--rule);background:var(--raised);color:var(--ink-2);
+  border-radius:5px;padding:6px 14px;font:inherit;font-size:14.5px;cursor:pointer}
+.vidtabs button span{color:var(--ink-3);font-size:13px;margin-left:7px}
+.vidtabs button[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.vidtabs button[aria-pressed="true"] span{color:var(--band-2)}
+.video{background:#0B1116;border-radius:var(--r);overflow:hidden;aspect-ratio:1918/886;display:grid;place-items:center;color:#A9B4BD;text-align:center}
 .video video{width:100%;height:100%;object-fit:contain;background:#000}
 .video .fallback{padding:28px;max-width:46ch}
 .video .fallback b{display:block;color:#fff;font-size:18px;margin-bottom:6px}
@@ -285,7 +430,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
     <a class="sec" href="#protocol">Protocol</a>
     <a class="sec" href="#results">Results</a>
     <a class="sec" href="#examples">Examples</a>
-    <a class="sec" href="#demo">Live demo</a>
+    <a class="sec" href="#demo">Video</a>
+    <a class="sec" href="#try">Try it</a>
     <a class="sec" href="#cite">Cite</a>
     <button class="theme" id="themeBtn" type="button">Dark mode</button>
   </div>
@@ -296,9 +442,9 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
   <div class="wrap over">
     <div class="abstract">
       <h2>Abstract</h2>
-      <p>Open-vocabulary visual grounding enables robots to localise task-relevant entities from natural-language queries without dependence on predefined perceptual taxonomies. However, existing benchmarks largely rely on short category labels and web-scraped imagery, leaving it unclear whether open-vocabulary models can robustly ground diverse queries and visual conditions under real deployments.</p>
-      <p>We introduce Pro-Bench, a prompt-conditioned benchmark for open-vocabulary visual grounding in heterogeneous, real-world environments. Pro-Bench includes 13k+ RGB frames from independent robotic domains (subterranean, industrial, indoor, outdoor, urban), with 74.5k manual instance annotations and 515 target queries covering categorical, attributive, relational, affordance, state, part-whole, negative, and compositional semantics.</p>
-      <p>We benchmarked 16 open-vocabulary model configurations in strict zero-shot inference, measuring localisation accuracy across IoU thresholds, end-to-end inference latency, prompt-induced performance variation, and target recovery consistency. Our results show that prompt-robustness is strongly architecture-dependent. Most model configurations (10/16) perform best with short category labels, whereas free-form queries yield the highest accuracy for only one. Moreover, similar aggregate mAP can conceal substantial differences in consistent target recovery across reformulations. Pro-Bench enables systematic evaluation of these gaps and supports prompt-robust visual grounding.</p>
+      <p>Open-vocabulary visual grounding enables robots to localise task-relevant entities from natural-language queries without dependence on predefined perceptual taxonomies. However, existing benchmarks largely rely on short category labels and web-scraped imagery, leaving it unclear whether open-vocabulary models can robustly ground diverse queries and visual conditions under real deployments.
+      We introduce Pro-Bench, a prompt-conditioned benchmark for open-vocabulary visual grounding in heterogeneous, real-world environments. Pro-Bench includes 13k+ RGB frames from independent robotic domains (subterranean, industrial, indoor, outdoor, urban), with 74.5k manual instance annotations and 515 target queries covering categorical, attributive, relational, affordance, state, part-whole, negative, and compositional semantics.
+      We benchmarked 16 open-vocabulary model configurations in strict zero-shot inference, measuring localisation accuracy across IoU thresholds, end-to-end inference latency, prompt-induced performance variation, and target recovery consistency. Our results show that prompt-robustness is strongly architecture-dependent. Most model configurations (10/16) perform best with short category labels, whereas free-form queries yield the highest accuracy for only one. Moreover, similar aggregate mAP can conceal substantial differences in consistent target recovery across reformulations. Pro-Bench enables systematic evaluation of these gaps and supports prompt-robust visual grounding.</p>
     </div>
     <dl class="facts" aria-label="Benchmark at a glance">
       <h2>Pro-Bench at a glance</h2>
@@ -316,8 +462,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
     <h2>What Pro-Bench found</h2>
     <p class="lede">An operator can refer to the same object in several ways. Most current open-vocabulary models performed exceptionally well with atomic or short categorical phrasing, and some break on harmless rewording.</p>
     <div class="findings">
-      <div class="finding"><h3>Short labels still win</h3><p>10 of 16 configurations score highest with the categorical label, 5 with the template form, and only YOLOE-X with the operator's free-form query.</p></div>
-      <div class="finding"><h3>A template can break a model</h3><p>Prefixing "a photo of" drops SAM3 from 0.417 to 0.044 mAP.5, while G-DINO-T gains 0.069 from the same change.</p></div>
+      <div class="finding"><h3>Short categorical labels still win</h3><p>10 of 16 configurations score highest with the categorical label, 5 with the template form, and only YOLOE-X with the operator's free-form query.</p></div>
+      <div class="finding"><h3>A template-based method can break model predictions</h3><p>Prefixing "a photo of" drops SAM3 from 0.417 to 0.044 mAP.5, while G-DINO-T gains 0.069 from the same change.</p></div>
       <div class="finding"><h3>Stable boxes are not reliable recovery</h3><p>SAM3's boxes barely move between phrasings (PLC 0.984), yet it recovers only 2.4% of targets under all three (PCR 0.024).</p></div>
       <div class="finding"><h3>Real time costs accuracy</h3><p>Within a 30 Hz budget, OmDet-T is the most accurate at 0.431 mAP.5. SAM3-Lite leads overall at 0.696 but needs 683 ms per frame.</p></div>
     </div>
@@ -344,7 +490,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
 <section id="benchmark">
   <div class="wrap">
     <h2>The benchmark</h2>
-    <p class="lede">RGB frames are curated from real robot sensors in five heterogeneous environments, enabling the models to face low light, occlusion, odd viewpoints and domain-specific objects characteristic of real-world scenarios. Click on a scene below to see the target annotations.</p>
+    <p class="lede">Pro-Bench RGBs are curated from real robot sensors across diverse environments, enabling the models to face low light, occlusions, unusual viewpoints, and domain-specific objects common in real-world scenarios. Click on a scene below to view the target annotations.</p>
     <div class="gallery" id="gallery"></div>
 
     <div class="cols">
@@ -367,8 +513,8 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
       </div>
     </div>
     <figure class="fig">
-      <div class="imgbox"><img src="assets/fig2_pipeline.jpg" alt="Pro-Bench construction pipeline: multi-domain scenes, human annotation of target instances, prompt construction with eight semantic types and three formulations, and dataset statistics." loading="lazy" width="1500" height="500"></div>
-      <figcaption>Pro-Bench construction pipeline and dataset statistics. Given the RGB frames curated from multidomain robotic datasets that depict realistic robot operating scenarios (1), we provide annotations for task-relevant targets with fine-grained polygon-based masks (2). Each target is associated with a human-defined free-form query and at least one semantic prompt category, from which we derive the categorical and template-wrapped variants for prompt-sensitivity evaluation (3). The final panel (4) summarises the resulting Pro-Bench dataset statistics</figcaption>
+      <div class="imgbox"><img src="assets/fig2_pipeline.jpg" alt="Pro-Bench construction pipeline: multi-domain scenes, human annotation of target instances, prompt construction with eight semantic types and three formulations, and dataset statistics." loading="lazy" width="1500" height="450"></div>
+      <figcaption>Pro-Bench construction pipeline and dataset statistics. Given the RGB frames curated from multidomain robotic datasets that depict realistic robot operating scenarios (1), we provide annotations for task-relevant targets with fine-grained polygon-based masks (2). Each target is associated with a human-defined free-form query and at least one semantic prompt category, from which we derive the categorical and template-wrapped variants (3). The final panel (4) summarises the resulting Pro-Bench dataset statistics</figcaption>
     </figure>
   </div>
 </section>
@@ -379,11 +525,11 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
     <p class="lede">Every target is queried three ways. Each formulation keeps the same referent, so a robust model should find the same object every time.</p>
     <div class="forms3">
       <div class="form3" style="border-top-color:var(--f-orig)"><h3 class="fo">Original <span class="muted">p<sup>orig</sup></span></h3>
-        <code>a person walking with a bicycle</code><p>The operator's free-form query, as written by the annotator.</p></div>
+        <code>an object suitable for sensor calibration</code><p>The operator's free-form query, as written by the annotator.</p></div>
       <div class="form3" style="border-top-color:var(--f-cat)"><h3 class="fc">Categorical <span class="muted">p<sup>cat</sup></span></h3>
-        <code>a person</code><p>A manually reviewed class-level noun phrase that drops attributes, relations, state and affordance.</p></div>
+        <code>a checkerboard</code><p>A manually reviewed class-level noun phrase that drops attributes, relations, state and affordance.</p></div>
       <div class="form3" style="border-top-color:var(--f-tmpl)"><h3 class="ft">Template <span class="muted">p<sup>tmpl</sup></span></h3>
-        <code>a photo of a person walking with a bicycle</code><p>The original query wrapped in the CLIP-style prompt template.</p></div>
+        <code>a photo of an object suitable for sensor calibration</code><p>The original query wrapped in the CLIP-style prompt template.</p></div>
     </div>
     <div class="eqs">
       <div class="eq">
@@ -445,9 +591,9 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
 <section id="examples">
   <div class="wrap">
     <h2>Qualitative examples</h2>
-    <p class="lede">A model can find the right region yet box it far too loosely, or miss a target that is plainly visible when the query describes it indirectly. No representative model returns a valid box for "an object suitable for sensor calibration", although the calibration board fills the frame.</p>
+    <p class="lede">A model can find the right region yet box it far too loosely, or miss a target that is plainly visible when the query describes it indirectly. No representative model returns a valid prediction for "an object suitable for sensor calibration", although the checkerboard fills the frame.</p>
     <figure class="fig" style="margin-top:24px">
-      <div class="imgbox"><img src="assets/fig6_qualitative.jpg" alt="Grid of seven scenes. Rows show the original image, the target queries with ground-truth boxes, and top-confidence predictions from YOLO-World-X, YOLOE-X, SAM 3 and OWLv2-L." loading="lazy" width="1800" height="900"></div>
+      <div class="imgbox"><img src="assets/fig6_qualitative.jpg" alt="Grid of seven scenes. Rows show the original image, the target queries with ground-truth boxes, and top-confidence predictions from YOLO-World-X, YOLOE-X, SAM 3 and OWLv2-L." loading="lazy" width="1800" height="800"></div>
       <figcaption>Top-confidence prediction per query for four representative models: real-time detection (YOLO-W-X, YOLOE-X), open-vocabulary segmentation (SAM3) and a transformer detector (OWLv2-L).</figcaption>
     </figure>
   </div>
@@ -455,24 +601,149 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
 
 <section id="demo">
   <div class="wrap">
-    <h2>Live demo</h2>
-    <p class="lede">The demo runs all the 16 model configurations side by side on your own images or a live camera, including RealSense depth, and shows the prompt-robustness protocol on a single scene.</p>
+    <h2>Video summary</h2>
     <div class="demo">
+      <div class="vidcol">
       <div class="video" id="videoBox">
-        <video id="demoVideo" controls playsinline preload="metadata" poster="" hidden></video>
-        <div class="fallback" id="videoFallback"><b>Run it on your GPU</b>The demo needs the model weights, so it runs locally. The commands on the right start it on any CUDA machine.</div>
+        <video id="demoVideo" controls playsinline preload="metadata" hidden></video>
+        <div class="fallback" id="videoFallback"><b>Project video</b>Covers the benchmark, the protocol, the results and the demo. Steps for running the demo locally are in <a href="#try" style="color:#F2C200">Try it yourself</a>.</div>
+      </div>
       </div>
       <div>
         <dl class="modes">
-          <div><dt>Compare models</dt><dd>One query, one scene, every selected model, with live latency next to the paper's figure.</dd></div>
+          <div><dt>Compare models</dt><dd>Compares the models' performance per query, per scene, and for every selected targets.</dd></div>
           <div><dt>Prompt robustness</dt><dd>Runs the original, categorical and template forms per model. Mark the target and each model reports whether it found it under each phrasing.</dd></div>
           <div><dt>Live camera</dt><dd>Webcam, OpenCV or RealSense input. Each model runs on the newest frame at its own speed, and you can edit the query while it streams.</dd></div>
         </dl>
-<pre><span class="c"># clone the code release, then</span>
-pip install -r requirements.txt
-python demo_server.py --config configs/benchmark.yaml \
-    --keep-resident --examples-dir demo_examples
-<span class="c"># open http://localhost:8000</span></pre>
+<p class="runlink">Steps for running it on your own GPU are in <a href="#try">Try it yourself</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="try">
+  <div class="wrap">
+    <h2>Try it yourself</h2>
+    <p class="lede">Pick a scene and a query, then watch what each model returns when the same target is
+      asked for three different ways. The boxes below are stored predictions from the benchmark run, not a
+      re-enactment. The walkthrough and the setup steps at the end of this section run the demo yourself.</p>
+
+    <details class="howto" open>
+      <summary>How to use this demo</summary>
+      <ol>
+        <li><span><b>Load a scene.</b> Click a thumbnail, or hit Random to jump to another
+          environment. The dashed white box marks the annotated target.</span></li>
+        <li><span><b>Pick a target query.</b> Each scene carries the operator-style queries written for it,
+          labelled with their semantic type: relational, affordance, negative and so on.</span></li>
+        <li><span><b>Choose the phrasing.</b> All three at once to compare, or one at a time to see
+          every box that phrasing returned with its confidence.</span></li>
+        <li><span><b>Choose the models.</b> Start with the top six, switch to the real-time group or all
+          of them, and raise the minimum score to drop weak detections.</span></li>
+        <li><span><b>Read the result.</b> Each card says whether that model found the target at
+          IoU&nbsp;&ge;&nbsp;0.5 under each phrasing, how many of the three it recovered, and how far the
+          box moved between them.</span></li>
+      </ol>
+    </details>
+    <div class="tryban" id="tryBan" hidden></div>
+
+      <div class="livewake" id="liveWake" hidden>
+        <b>The live endpoint is asleep.</b> It wakes on the first request and takes a minute or two.
+        Reload this page shortly to run your own images; the stored examples below work either way.
+      </div>
+
+      <div class="livepanel" id="livePanel" hidden>
+        <div class="livehead">
+          <h3>Run on your own image</h3>
+          <p>Hosted models: <span id="liveModels"></span>. <span id="liveLimit"></span></p>
+        </div>
+        <div class="livegrid">
+          <div>
+            <div class="liverow">
+              <label class="btnfile">Choose image<input type="file" id="liveFile" accept="image/*"></label>
+              <button class="btnq" id="liveCam" type="button">Use camera</button>
+              <button class="btnq" id="liveSnap" type="button" hidden>Take photo</button>
+            </div>
+            <video id="liveVideo" autoplay playsinline muted hidden></video>
+            <div class="liveprev" id="livePrev" hidden><canvas id="livePrevCanvas"></canvas></div>
+            <div class="liverow small">
+              <span id="liveBoxHint">Optional: drag on the image to mark the target.</span>
+              <button class="btnq" id="liveClearBox" type="button" hidden>Clear box</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    <div class="try" id="tryUI" hidden>
+      <aside class="tryside">
+        <div class="trystep">
+          <h3><span class="n">1</span>Scene <button class="btnlink" id="tryBack" type="button" hidden>Back to stored</button><button class="btnlink" id="tryRandom" type="button">Random</button></h3>
+          <div class="scenes" id="tryScenes"></div>
+        </div>
+        <div class="trystep">
+          <h3><span class="n">2</span>Target query</h3>
+          <div class="qlist" id="tryQueries"></div>
+        </div>
+        <div class="trystep">
+          <h3><span class="n">3</span>Phrasing</h3>
+          <div class="tryseg" id="tryForm" role="group" aria-label="Which phrasing to show">
+            <button data-f="all" aria-pressed="true">All three</button>
+            <button data-f="orig" aria-pressed="false">Orig.</button>
+            <button data-f="cat" aria-pressed="false">Cat.</button>
+            <button data-f="tmpl" aria-pressed="false">Tmpl.</button>
+          </div>
+        </div>
+        <div class="trystep">
+          <h3><span class="n">4</span>Models<span class="side" id="tryCount"></span></h3>
+          <div class="mquick">
+            <button data-q="top6" type="button">Top 6</button>
+            <button data-q="rt" type="button">Real-time</button>
+            <button data-q="all" type="button">All</button>
+          </div>
+          <div class="mlist" id="tryModels"></div>
+        </div>
+        <div class="trystep">
+          <label class="tryrange">Min score
+            <input type="range" id="tryConf" min="0" max="0.9" step="0.05" value="0">
+            <span id="tryConfVal">0.00</span></label>
+        </div>
+      </aside>
+
+      <div class="trymain">
+        <div class="askedbar" id="tryAsked"></div>
+        <div class="trygrid" id="tryGrid"></div>
+        <p class="tryfoot" id="tryFoot"></p>
+      </div>
+    </div>
+
+    <div class="runblock">
+      <div>
+        <div class="rbvid">
+          <video id="walkVideo" controls playsinline preload="metadata" hidden></video>
+          <div class="rbfall" id="walkFallback"><b>Demo walkthrough</b>A recording of the demo
+            running all 16 configurations, from a single query to the live camera.</div>
+        </div>
+        <p class="rbcap">The walkthrough, recorded in real time on an RTX 4090. The project video
+          is in the <a href="#demo">Video summary</a> section.</p>
+      </div>
+      <div class="runsteps">
+        <h3>Run it on your own machine</h3>
+        <p>The demo loads the real model weights, so it runs locally on a CUDA GPU rather than in
+          this page.</p>
+        <ol>
+          <li><span><b>Get the code and the weights.</b> Clone the release and install the
+            requirements. Checkpoints download on first use.
+            <pre>pip install -r requirements.txt</pre></span></li>
+          <li><span><b>Start the demo server</b> against the same config the benchmark used.
+            <pre>python demo_server.py \
+  --config configs/benchmark.yaml \
+  --keep-resident \
+  --examples-dir demo_examples</pre></span></li>
+          <li><span><b>Open <code>http://localhost:8000</code></b> and pick a mode: compare models,
+            prompt robustness, or live camera.</span></li>
+          <li><span><b>Give it a scene.</b> Upload an image, point it at a folder, or capture a
+            frame from a webcam or RealSense camera.</span></li>
+        </ol>
+        <p class="req">Needs a CUDA GPU. All 16 models resident takes about 24&nbsp;GB of VRAM;
+          drop <code>--keep-resident</code> to load them one at a time on less.</p>
       </div>
     </div>
   </div>
@@ -481,26 +752,24 @@ python demo_server.py --config configs/benchmark.yaml \
 <section id="cite">
   <div class="wrap">
     <h2>Cite Pro-Bench</h2>
+    <p>To cite this work, please use the following BibTeX entry:</p>
     <div class="cite">
       <button class="copy" id="copyBib" type="button">Copy BibTeX</button>
 <pre id="bib">@article{nwankwo2026probench,
-  title   = {Pro-Bench: Prompt-Robust Open-Vocabulary Visual Grounding
-             Across Real-World Heterogeneous Environments},
-  author  = {Nwankwo, Linus and Alaran, Muslim and Rauch, Christian and
-             Obilikpa, Stanley Chukwuebuka and Rueckert, Elmar},
+  title   = {Pro-Bench: Prompt-Robust Open-Vocabulary Visual Grounding Across Real-World Heterogeneous Environments},
+  author  = {Nwankwo, Linus and Alaran, Muslim and Rauch, Christian and Obilikpa, Stanley Chukwuebuka and Rueckert, Elmar},
   journal = {arXiv preprint},
   year    = {2026}
 }</pre>
     </div>
-    <p class="ack">This work is supported by the MINEVIEW project (#FO999927835), funded by the Republic of Austria, Federal Ministry of Environment, Innovation and Technology.</p>
   </div>
 </section>
 </main>
 
 <footer>
   <div class="wrap">
-    <span>Pro-Bench, Chair of Cyber-Physical Systems, Montanuniversität Leoben</span>
-    <span>Dataset, annotations and per-model configurations are released for research use.</span>
+    <span>This work is supported by the MINEVIEW project (#FO999927835), funded by the Republic of Austria, Federal Ministry of Environment, Innovation and Technology.</span>
+    <span>Dataset, annotations and per-model configurations are released for research use only.</span>
   </div>
 </footer>
 
@@ -511,13 +780,25 @@ python demo_server.py --config configs/benchmark.yaml \
 const ASSET = {"bar.jpg": "assets/bar.jpg", "bar_ann.jpg": "assets/bar_ann.jpg", "barrels.jpg": "assets/barrels.jpg", "barrels_ann.jpg": "assets/barrels_ann.jpg", "dog.jpg": "assets/dog.jpg", "dog_ann.jpg": "assets/dog_ann.jpg", "excavation.jpg": "assets/excavation.jpg", "excavation_ann.jpg": "assets/excavation_ann.jpg", "fig2_pipeline.jpg": "assets/fig2_pipeline.jpg", "fig6_qualitative.jpg": "assets/fig6_qualitative.jpg", "office.jpg": "assets/office.jpg", "office_ann.jpg": "assets/office_ann.jpg", "og.jpg": "assets/og.jpg", "tabletop.jpg": "assets/tabletop.jpg", "tabletop_ann.jpg": "assets/tabletop_ann.jpg", "tunnel.jpg": "assets/tunnel.jpg", "tunnel_target.png": "assets/tunnel_target.png"};
 
 const LINKS = {
-  paper:   "",   
-  arXiv:  "https://arxiv.org/abs/2609.27076",
-  code:    "",  
-  dataset: "",   
-  video:   "",   
+  paper:   "https://arxiv.org/abs/2609.27076", 
+  pdf:     "",
+  code:    "",
+  dataset: "",  
+
+  walkthrough: {mp4: "assets/video/probench_demo.mp4",
+                webm: "assets/video/probench_demo.webm",
+                poster: "assets/video/poster.jpg"},
+  videos: {
+    pres: {mp4: "assets/video/pro-bench-video.mp4",
+           webm: "assets/video/probench_presentation.webm",
+           poster: "assets/video/poster_presentation.jpg"},
+    demo: {mp4: "assets/video/probench_demo.mp4",
+           webm: "assets/video/probench_demo.webm",
+           poster: "assets/video/poster.jpg"},
+  },
 };
 
+const DEMO_API = "";
 const MODELS = [
  ["SAM3-Lite","Segmentation",.696,.594,.562,683.0,.737,.541,.196,"cat",.847,.917],
  ["OWLv2-L","Transformer",.567,.477,.443,244.8,.540,.569,.029,"tmpl",.482,.994],
@@ -554,10 +835,11 @@ const ICON = {
 };
 function renderLinks() {
   const items = [
-    {label:"Paper", href:LINKS.paper || LINKS.arXiv, icon:ICON.paper, primary:true},
+    {label:"Paper", href:LINKS.paper || LINKS.pdf, icon:ICON.paper, primary:true},
     {label:"Code", href:LINKS.code, icon:ICON.code},
     {label:"Dataset", href:LINKS.dataset, icon:ICON.data},
-    {label:"Live demo", href:"#demo", icon:ICON.demo},
+    {label:"Video", href:LINKS.videos.demo.mp4, icon:ICON.demo},
+    {label:"Try it yourself", href:"#try", icon:ICON.demo},
     {label:"BibTeX", href:"#cite", icon:ICON.cite},
   ];
   $("#links").innerHTML = items.map(i => i.href
@@ -587,7 +869,7 @@ function renderHero() {
     $$(".ask").forEach(b => b.setAttribute("aria-pressed", b.dataset.f === f));
     box.setAttribute("stroke", f ? getComputedStyle(document.documentElement).getPropertyValue(f === "orig" ? "--d-orig" : f === "cat" ? "--d-cat" : "--d-tmpl").trim() : "#F2C200");
     note.innerHTML = f
-      ? `${FL[f]} phrasing: mean mAP.5 of ${mean(f).toFixed(3)} across the 16 models, and the best choice for ${best(f)} of them. SAM3 alone scores ${MODELS[3][f].toFixed(3)}.`
+      ? `${FL[f]} phrasing: mean mAP.5 of ${mean(f).toFixed(3)} across the 16 models, and the best choice for ${best(f)} of them.`
       : "Three ways to ask for the same door. Bars show mean mAP.5 over all 515 Pro-Bench queries for the 16 models; select a phrasing for details.";
   };
   $$(".ask").forEach(b => b.onclick = () => set(b.getAttribute("aria-pressed") === "true" ? null : b.dataset.f));
@@ -813,10 +1095,31 @@ function renderTaxo() { $("#taxo").innerHTML = TAXO.map(t => `<tr><td>${t[0]}</t
 
 /* ---------------- demo video ---------------- */
 function setupVideo() {
-  if (!LINKS.video) return;
-  const v = $("#demoVideo");
-  v.src = LINKS.video; v.hidden = false; $("#videoFallback").hidden = true;
-  v.onerror = () => { v.hidden = true; $("#videoFallback").hidden = false; };
+  const set = LINKS.videos;
+  if (!set || !Object.keys(set).length) return;
+  const v = $("#demoVideo"), tabs = $("#vidTabs");
+  const load = key => {
+    const c = set[key];
+    if (!c) return;
+    v.pause();
+    v.innerHTML = "";
+    if (c.poster) v.poster = c.poster;
+    [[c.mp4, "video/mp4"], [c.webm, "video/webm"]].forEach(([u, t]) => {
+      if (!u) return;
+      const s = document.createElement("source");
+      s.src = u; s.type = t; v.appendChild(s);
+    });
+    v.load();
+  };
+  if (tabs) tabs.hidden = Object.keys(set).length < 2;
+  $$("#vidTabs button").forEach(b => b.onclick = () => {
+    $$("#vidTabs button").forEach(x => x.setAttribute("aria-pressed", x === b));
+    load(b.dataset.v);
+    v.play().catch(() => {});   
+  });
+  load(Object.keys(set)[0]);
+  v.hidden = false; $("#videoFallback").hidden = true;
+  v.addEventListener("error", () => { v.hidden = true; $("#videoFallback").hidden = false; });
 }
 
 /* ---------------- misc ---------------- */
@@ -851,7 +1154,501 @@ function segBind(sel, attr, fn) {
 }
 
 renderLinks(); renderHero(); renderSens(); renderPareto(); renderPcr(); renderTight(); renderTable();
-renderGallery(); renderTaxo(); setupVideo(); setupCopy(); setupTheme(); setupNav();
+function setupWalkthrough() {
+  const c = LINKS.walkthrough;
+  if (!c || (!c.mp4 && !c.webm)) return;
+  const v = $("#walkVideo");
+  if (!v) return;
+  if (c.poster) v.poster = c.poster;
+  [[c.mp4, "video/mp4"], [c.webm, "video/webm"]].forEach(([u, t]) => {
+    if (!u) return;
+    const s = document.createElement("source");
+    s.src = u; s.type = t; v.appendChild(s);
+  });
+  v.hidden = false; $("#walkFallback").hidden = true;
+  v.addEventListener("error", () => { v.hidden = true; $("#walkFallback").hidden = false; });
+  v.load();
+}
+
+renderGallery(); renderTaxo(); setupVideo(); setupWalkthrough(); setupCopy(); setupTheme(); setupNav();
+
+const REPLAY_BASE = "assets/replay/";
+const TRY = {data: null, scene: 0, query: 0, form: "all", models: new Set(),
+             conf: 0, imgs: new Map()};
+
+function tryBanner(html) {
+  const b = $("#tryBan");
+  b.innerHTML = html;
+  b.hidden = false;
+}
+
+async function loadReplay() {
+  const inline = document.getElementById("replayData");
+  let data = null;
+  if (inline && inline.textContent.trim()) {
+    try { data = JSON.parse(inline.textContent); } catch (e) { /* fall through */ }
+  }
+  if (!data) {
+    try {
+      const r = await fetch(REPLAY_BASE + "replay.json", {cache: "no-store"});
+      if (r.ok) data = await r.json();
+    } catch (e) { /* offline, or no bundle published */ }
+  }
+  if (!data || !data.scenes || !data.scenes.length) {
+    console.info("Pro-Bench: no replay bundle at " + REPLAY_BASE + "replay.json. "
+      + "Generate one with export_replay.py to turn on the interactive demo.");
+    return;
+  }
+  TRY.data = data;
+  data.models.forEach((m, i) => { if (i < 6) TRY.models.add(m.key); });
+  $("#tryUI").hidden = false;
+  buildTryScenes();
+  buildTryModels();
+  bindTry();
+  selectScene(0);
+}
+
+/* ---------------- sidebar ---------------- */
+function sceneSrc(s) { return s.src || REPLAY_BASE + "scenes/" + s.file; }
+
+function buildTryScenes() {
+  $("#tryScenes").innerHTML = TRY.data.scenes.map((s, i) =>
+    `<button data-i="${i}" aria-pressed="false" title="${esc(s.title)}${s.domain ? " — " + esc(s.domain) : ""}">
+       <img src="${esc(sceneSrc(s))}" alt="${esc(s.title)}" loading="lazy"></button>`).join("");
+  $$("#tryScenes button").forEach(b => b.onclick = () => selectScene(+b.dataset.i));
+}
+
+function buildTryModels() {
+  const fams = [];
+  TRY.data.models.forEach(m => { if (!fams.includes(m.family)) fams.push(m.family); });
+  $("#tryModels").innerHTML = fams.map(f =>
+    TRY.data.models.filter(m => m.family === f).map(m =>
+      `<label title="${esc(m.key)}"><input type="checkbox" data-k="${esc(m.key)}">
+         <span class="nm">${esc(m.name)}</span>
+         <span class="num">${m.paper ? m.paper.map50.toFixed(3) : ""}</span></label>`).join("")).join("");
+  $$("#tryModels input").forEach(cb => cb.onchange = () => {
+    cb.checked ? TRY.models.add(cb.dataset.k) : TRY.models.delete(cb.dataset.k);
+    syncTryModels();
+    if (TRY.mode === "live") backToStored(); else renderTryCards();
+  });
+  syncTryModels();
+}
+
+function syncTryModels() {
+  $$("#tryModels input").forEach(cb => cb.checked = TRY.models.has(cb.dataset.k));
+  $("#tryCount").textContent = `${TRY.models.size} of ${TRY.data.models.length}`;
+}
+
+function tryQuickPick(q) {
+  const ms = TRY.data.models;
+  TRY.models.clear();
+  if (q === "all") ms.forEach(m => TRY.models.add(m.key));
+  if (q === "top6") ms.slice().sort((a, b) => (b.paper ? b.paper.map50 : 0) - (a.paper ? a.paper.map50 : 0))
+    .slice(0, 6).forEach(m => TRY.models.add(m.key));
+  if (q === "rt") ms.filter(m => m.paper && m.paper.lat <= RT).forEach(m => TRY.models.add(m.key));
+  if (!TRY.models.size) ms.slice(0, 6).forEach(m => TRY.models.add(m.key));
+  syncTryModels(); renderTryCards();
+}
+
+function selectScene(i) {
+  TRY.scene = i; TRY.query = 0; TRY.mode = "replay";
+  const back = document.getElementById("tryBack"); if (back) back.hidden = true;
+  $$("#tryScenes button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.i === i));
+  const qs = TRY.data.scenes[i].queries;
+  $("#tryQueries").innerHTML = qs.map((q, j) =>
+    `<button data-j="${j}" aria-pressed="${j === 0}">${esc(q.texts.orig)}
+       <span class="qt">${esc(q.type || "query")}${q.gt ? "" : " · no marked target"}</span></button>`).join("");
+  $$("#tryQueries button").forEach(b => b.onclick = () => selectQuery(+b.dataset.j));
+  renderAsked(); renderTryCards();
+}
+
+function selectQuery(j) {
+  TRY.query = j;
+  $$("#tryQueries button").forEach(b => b.setAttribute("aria-pressed", +b.dataset.j === j));
+  renderAsked(); renderTryCards();
+}
+
+function activeModels(q) {
+  if (TRY.mode === "live") return (LIVE.cfg ? LIVE.cfg.models : []).filter(m => q.models[m.key]);
+  return TRY.data.models.filter(m => TRY.models.has(m.key) && q.models[m.key]);
+}
+function curScene() { return TRY.mode === "live" ? TRY.liveScene : TRY.data.scenes[TRY.scene]; }
+function curQuery() { return TRY.mode === "live" ? TRY.liveQuery : TRY.data.scenes[TRY.scene].queries[TRY.query]; }
+function visForms() { return TRY.form === "all" ? F : [TRY.form]; }
+
+/* ---------------- what was asked ---------------- */
+function renderAsked() {
+  const q = curQuery(), vis = visForms();
+  $("#tryAsked").innerHTML = F.map(f => {
+    const ms = activeModels(q);
+    const n = ms.filter(m => { const r = q.models[m.key]; return r && r[f] && dets(r[f]).length; }).length;
+    return `<div class="asked${vis.includes(f) ? "" : " dim"}">
+      <span class="sw" style="background:${FC[f]}"></span><span class="lb" style="color:${FC[f]}">${FL[f]}</span>
+      <q>${esc(q.texts[f])}</q>
+      <span class="cnt">${n} of ${ms.length} return a box</span></div>`;
+  }).join("");
+}
+
+/* ---------------- geometry ---------------- */
+function dets(run) {
+  const out = [];
+  if (!run || !run.boxes) return out;
+  for (let i = 0; i < run.boxes.length; i++)
+    if (run.scores[i] >= TRY.conf) out.push({box: run.boxes[i], score: run.scores[i]});
+  return out;
+}
+function tryIoU(a, b) {
+  const w = Math.max(0, Math.min(a[2], b[2]) - Math.max(a[0], b[0]));
+  const h = Math.max(0, Math.min(a[3], b[3]) - Math.max(a[1], b[1]));
+  const inter = w * h, u = (a[2] - a[0]) * (a[3] - a[1]) + (b[2] - b[0]) * (b[3] - b[1]) - inter;
+  return u > 0 ? inter / u : 0;
+}
+function meanPairIoU(bs) {
+  let s = 0, n = 0;
+  for (let i = 0; i < bs.length; i++) for (let j = i + 1; j < bs.length; j++) { s += tryIoU(bs[i], bs[j]); n++; }
+  return n ? s / n : null;
+}
+function matched(run, gt) {
+  if (!gt) return null;
+  const d = dets(run).find(d => tryIoU(d.box, gt) >= 0.5);
+  return d ? d.box : null;
+}
+
+/* ---------------- cards ---------------- */
+function tryImage(src, onload) {
+  let im = TRY.imgs.get(src);
+  if (!im) { im = new Image(); im.onload = onload; im.src = src; TRY.imgs.set(src, im); }
+  return im;
+}
+
+function renderTryCards() {
+  const q = curQuery(), scene = curScene(), vis = visForms();
+  const ms = activeModels(q);
+  $("#tryGrid").innerHTML = ms.map(m => {
+    const r = q.models[m.key] || {};
+    if (r.error) return `<article class="tcard fail" data-k="${esc(m.key)}">
+      <div class="tchead"><h4>${esc(m.name)}</h4><span class="fam">${esc(m.family)}</span></div>
+      <div class="tcwell"><div class="none">${esc(r.error)}</div></div></article>`;
+    const lat = Math.max(...F.map(f => (r[f] && r[f].latency_ms) || 0));
+    const rows = F.filter(f => vis.includes(f)).map(f => {
+      const d = dets(r[f]);
+      const mark = q.gt ? (matched(r[f], q.gt) ? '<span class="ok">found</span>' : '<span class="no">missed</span>')
+                        : `<span class="v">${d.length} box${d.length === 1 ? "" : "es"}</span>`;
+      return `<div class="tcrow"><span class="sw" style="background:${FC[f]}"></span>
+        <span class="lb" style="color:${FC[f]}">${FL[f]}</span>
+        <span class="v">${d[0] ? "top " + d[0].score.toFixed(2) : "no detection"}</span>${mark}</div>`;
+    }).join("");
+    let verdict = "";
+    if (TRY.form === "all") {
+      if (q.gt) {
+        const hits = F.map(f => matched(r[f], q.gt)).filter(Boolean);
+        const plc = hits.length === 3 ? meanPairIoU(hits) : null;
+        verdict = `<div class="verdict"><span>Recovered <b>${hits.length}/3</b></span>
+          <span>box agreement <b>${plc == null ? "–" : plc.toFixed(2)}</b></span></div>`;
+      } else {
+        const tops = F.map(f => (dets(r[f])[0] || {}).box).filter(Boolean);
+        const ag = tops.length === 3 ? meanPairIoU(tops) : null;
+        verdict = `<div class="verdict"><span>Top-box agreement</span>
+          <b>${ag == null ? "incomplete" : ag.toFixed(2) + " IoU"}</b></div>`;
+      }
+    }
+    return `<article class="tcard" data-k="${esc(m.key)}">
+      <div class="tchead"><h4>${esc(m.name)}</h4><span class="fam">${esc(m.family)}</span>
+        <span class="lat">${lat ? lat.toFixed(0) + " ms" : ""}</span></div>
+      <div class="tcwell"><canvas></canvas></div>
+      <div class="tcfoot">${rows}${verdict}</div></article>`;
+  }).join("");
+  ms.forEach(m => drawTryCard(m.key, scene, q));
+  renderAsked(); renderTryFoot(ms, q);
+}
+
+function drawTryCard(key, scene, q) {
+  const card = document.querySelector(`.tcard[data-k="${CSS.escape(key)}"] canvas`);
+  if (!card) return;
+  const dpr = window.devicePixelRatio || 1, w = card.clientWidth, h = card.clientHeight;
+  if (!w || !h) return;
+  card.width = Math.round(w * dpr); card.height = Math.round(h * dpr);
+  const ctx = card.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  const im = tryImage(sceneSrc(scene), () => renderTryCards());
+  if (!im.complete || !im.naturalWidth) return;
+  const s = Math.min(w / scene.w, h / scene.h), ox = (w - scene.w * s) / 2, oy = (h - scene.h * s) / 2;
+  ctx.drawImage(im, ox, oy, scene.w * s, scene.h * s);
+  const r = q.models[key] || {}, vis = visForms(), multi = vis.length > 1;
+  if (q.gt) {
+    const [x1, y1, x2, y2] = q.gt;
+    ctx.save(); ctx.setLineDash([6, 4]);
+    ctx.lineWidth = 3.5; ctx.strokeStyle = "rgba(0,0,0,.7)";
+    ctx.strokeRect(ox + x1 * s, oy + y1 * s, (x2 - x1) * s, (y2 - y1) * s);
+    ctx.lineWidth = 1.8; ctx.strokeStyle = "#fff";
+    ctx.strokeRect(ox + x1 * s, oy + y1 * s, (x2 - x1) * s, (y2 - y1) * s);
+    ctx.restore();
+  }
+  vis.forEach(f => {
+    const TC = {orig: "#7EA2FF", cat: "#35D8D2", tmpl: "#FF62B4"};
+    const d = dets(r[f]).slice(0, multi ? 1 : 6), col = TC[f];
+    d.forEach(x => {
+      const [x1, y1, x2, y2] = x.box;
+      const X = ox + x1 * s, Y = oy + y1 * s, BW = (x2 - x1) * s, BH = (y2 - y1) * s;
+      ctx.lineWidth = 4; ctx.strokeStyle = "rgba(0,0,0,.6)"; ctx.strokeRect(X, Y, BW, BH);
+      ctx.lineWidth = 2; ctx.strokeStyle = col; ctx.strokeRect(X, Y, BW, BH);
+      if (!multi) {
+        const label = x.score.toFixed(2);
+        ctx.font = "600 11px Barlow, system-ui, sans-serif";
+        const tw = ctx.measureText(label).width + 8, ly = Y - 15 < 0 ? Y : Y - 15;
+        ctx.fillStyle = col; ctx.fillRect(X - 1, ly, tw, 15);
+        ctx.fillStyle = "#101820"; ctx.fillText(label, X + 3, ly + 11);
+      }
+    });
+  });
+}
+
+function renderTryFoot(ms, q) {
+  const total = ms.length;
+  let line;
+  if (q.gt) {
+    const all3 = ms.filter(m => {
+      const r = q.models[m.key] || {};
+      return !r.error && F.every(f => matched(r[f], q.gt));
+    }).length;
+    line = `<span><b>${all3}</b> of <b>${total}</b> models recover this target under all three phrasings.</span>`;
+  } else {
+    const all3 = ms.filter(m => {
+      const r = q.models[m.key] || {};
+      return !r.error && F.every(f => dets(r[f]).length);
+    }).length;
+    line = `<span><b>${all3}</b> of <b>${total}</b> models return a box under all three phrasings.</span>`;
+  }
+  if (TRY.mode === "live") {
+    $("#tryFoot").innerHTML = line + `<span class="sep">|</span>`
+      + `<span>Live run on your image, on a shared GPU, so the latencies are higher `
+      + `than the paper's isolated figures.</span>`;
+    return;
+  }
+  const d = TRY.data;
+  $("#tryFoot").innerHTML = line + `<span class="sep">|</span>`
+    + `<span>Stored predictions${d.generated ? ", exported " + esc(d.generated) : ""}`
+    + `${d.device && d.device !== "cuda" ? "" : " on an RTX 4090"}.</span>`;
+}
+
+/* ---------------- wiring ---------------- */
+function bindTry() {
+  $$("#tryForm button").forEach(b => b.onclick = () => {
+    TRY.form = b.dataset.f;
+    $$("#tryForm button").forEach(x => x.setAttribute("aria-pressed", x === b));
+    renderTryCards();
+  });
+  $$("#tryModels").length;
+  $$(".mquick button").forEach(b => b.onclick = () => tryQuickPick(b.dataset.q));
+  $("#tryConf").oninput = e => {
+    TRY.conf = +e.target.value;
+    $("#tryConfVal").textContent = TRY.conf.toFixed(2);
+    renderTryCards();
+  };
+  $("#tryRandom").onclick = () => {
+    const n = TRY.data.scenes.length;
+    if (n < 2) return selectScene(0);
+    let i = TRY.scene;
+    while (i === TRY.scene) i = Math.floor(Math.random() * n);
+    selectScene(i);
+  };
+  let t;
+  new ResizeObserver(() => { clearTimeout(t); t = setTimeout(() => renderTryCards(), 120); })
+    .observe($("#tryGrid"));
+}
+
+const LIVE = {on: false, cfg: null, blob: null, img: null, box: null,
+              drawing: false, busy: false, stream: null};
+
+async function setupLive() {
+  if (!DEMO_API) return;
+  let cfg = null;
+  try {
+    const r = await fetch(DEMO_API.replace(/\/$/, "") + "/models", {cache: "no-store"});
+    if (r.ok) cfg = await r.json();
+  } catch (e) { /* asleep, offline or blocked */ }
+  if (!cfg || !cfg.ready || !cfg.models || !cfg.models.length) {
+    $("#liveWake").hidden = false;
+    return;
+  }
+  LIVE.cfg = cfg;
+  $("#livePanel").hidden = false;
+  $("#liveModels").textContent = cfg.models.map(m => m.name).join(", ");
+  $("#liveLimit").textContent = `${cfg.runs_per_hour} runs per hour, images are not stored.`;
+  bindLive();
+}
+
+function bindLive() {
+  $("#liveFile").onchange = e => { if (e.target.files[0]) useLiveImage(e.target.files[0]); };
+  $("#liveCam").onclick = startLiveCam;
+  $("#liveSnap").onclick = snapLiveCam;
+  $("#liveRun").onclick = runLive;
+  $("#liveClearBox").onclick = () => { LIVE.box = null; drawLivePreview(); syncLiveBox(); };
+  $("#liveQuery").oninput = () => {
+    if (!$("#liveCat").dataset.touched) $("#liveCat").value = suggestCatText($("#liveQuery").value);
+  };
+  $("#liveCat").oninput = () => $("#liveCat").dataset.touched = "1";
+  bindLiveBox();
+}
+const LIVE_STOP = /\b(with|without|on|in|near|next|beside|behind|above|below|under|over|ahead|that|which|who|wearing|carrying|holding|covering|leaning|placed|aligned|cast|for|used|suitable|not|jumping|walking|sitting|standing|parked|lying|to|from|by|at|against|closer|between|of)\b/;
+const LIVE_ADJ = /\b(red|pink|blue|green|yellow|black|white|grey|gray|orange|purple|brown|rust|rusty|metal|metallic|wooden|small|large|big|tall|short|stationary|open|closed|empty|old|new|dark|bright|left|right)\b/g;
+function suggestCatText(q) {
+  let s = q.trim().toLowerCase().replace(/[.,;:!?"]/g, "").replace(/^a photo of\s+/, "");
+  const cut = s.search(LIVE_STOP);
+  if (cut > 0) s = s.slice(0, cut);
+  s = s.replace(/^(a|an|the|some)\s+/, "");
+  const core = s.replace(LIVE_ADJ, " ").replace(/\s+/g, " ").trim() || s.trim();
+  if (!core) return "";
+  return (/^[aeiou]/.test(core) ? "an " : "a ") + core;
+}
+
+/* ---------------- image in ---------------- */
+function useLiveImage(blob) {
+  stopLiveCam();
+  LIVE.blob = blob; LIVE.box = null;
+  const im = new Image();
+  im.onload = () => { LIVE.img = im; $("#livePrev").hidden = false; drawLivePreview(); syncLiveBox(); };
+  im.src = URL.createObjectURL(blob);
+  liveStatus("");
+}
+
+async function startLiveCam() {
+  try {
+    LIVE.stream = await navigator.mediaDevices.getUserMedia({video: {width: {ideal: 1280}}});
+  } catch (e) {
+    liveStatus("The camera is not available: " + e.message, true);
+    return;
+  }
+  const v = $("#liveVideo");
+  v.srcObject = LIVE.stream; v.hidden = false; $("#liveSnap").hidden = false;
+}
+function snapLiveCam() {
+  const v = $("#liveVideo");
+  if (!v.videoWidth) return;
+  const c = document.createElement("canvas");
+  c.width = v.videoWidth; c.height = v.videoHeight;
+  c.getContext("2d").drawImage(v, 0, 0);
+  c.toBlob(b => b && useLiveImage(b), "image/jpeg", 0.9);
+}
+function stopLiveCam() {
+  if (LIVE.stream) { LIVE.stream.getTracks().forEach(t => t.stop()); LIVE.stream = null; }
+  $("#liveVideo").hidden = true; $("#liveSnap").hidden = true;
+}
+
+/* ---------------- target box ---------------- */
+function drawLivePreview(temp) {
+  const c = $("#livePrevCanvas");
+  if (!LIVE.img) return;
+  const dpr = window.devicePixelRatio || 1, w = c.clientWidth, h = c.clientHeight;
+  c.width = Math.round(w * dpr); c.height = Math.round(h * dpr);
+  const ctx = c.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, w, h);
+  const im = LIVE.img, s = Math.min(w / im.naturalWidth, h / im.naturalHeight);
+  const ox = (w - im.naturalWidth * s) / 2, oy = (h - im.naturalHeight * s) / 2;
+  ctx.drawImage(im, ox, oy, im.naturalWidth * s, im.naturalHeight * s);
+  const b = temp || LIVE.box;
+  if (b) {
+    const X = ox + b[0] * im.naturalWidth * s, Y = oy + b[1] * im.naturalHeight * s;
+    const BW = (b[2] - b[0]) * im.naturalWidth * s, BH = (b[3] - b[1]) * im.naturalHeight * s;
+    ctx.save(); ctx.setLineDash([6, 4]);
+    ctx.lineWidth = 4; ctx.strokeStyle = "rgba(0,0,0,.7)"; ctx.strokeRect(X, Y, BW, BH);
+    ctx.lineWidth = 2; ctx.strokeStyle = "#fff"; ctx.strokeRect(X, Y, BW, BH);
+    ctx.restore();
+  }
+}
+function bindLiveBox() {
+  const c = $("#livePrevCanvas");
+  let start = null;
+  const at = e => {
+    const r = c.getBoundingClientRect(), im = LIVE.img;
+    if (!im) return null;
+    const s = Math.min(r.width / im.naturalWidth, r.height / im.naturalHeight);
+    const ox = (r.width - im.naturalWidth * s) / 2, oy = (r.height - im.naturalHeight * s) / 2;
+    return [Math.min(1, Math.max(0, (e.clientX - r.left - ox) / (im.naturalWidth * s))),
+            Math.min(1, Math.max(0, (e.clientY - r.top - oy) / (im.naturalHeight * s)))];
+  };
+  const mk = (a, b) => [Math.min(a[0], b[0]), Math.min(a[1], b[1]), Math.max(a[0], b[0]), Math.max(a[1], b[1])];
+  c.onpointerdown = e => { if (!LIVE.img) return; start = at(e); if (start) c.setPointerCapture(e.pointerId); };
+  c.onpointermove = e => { if (start) drawLivePreview(mk(start, at(e))); };
+  c.onpointerup = e => {
+    if (!start) return;
+    const b = mk(start, at(e)); start = null;
+    LIVE.box = (b[2] - b[0] > .02 && b[3] - b[1] > .02) ? b : null;
+    drawLivePreview(); syncLiveBox();
+  };
+}
+function syncLiveBox() {
+  $("#liveClearBox").hidden = !LIVE.box;
+  $("#liveBoxHint").textContent = LIVE.box
+    ? "Target marked. Each model is checked at IoU ≥ 0.5."
+    : "Optional: drag on the image to mark the target.";
+}
+
+/* ---------------- run ---------------- */
+function liveStatus(text, bad) {
+  const el = $("#liveStatus");
+  el.textContent = text;
+  el.className = "livestatus" + (bad ? " bad" : "");
+}
+
+async function runLive() {
+  if (LIVE.busy) return;
+  const query = $("#liveQuery").value.trim();
+  if (!LIVE.blob) { liveStatus("Choose an image or take a photo first.", true); return; }
+  if (!query) { liveStatus("Type what the model should find.", true); $("#liveQuery").focus(); return; }
+  LIVE.busy = true;
+  $("#liveRun").disabled = true;
+  liveStatus("Running three phrasings on " + LIVE.cfg.models.length + " models…");
+
+  const fd = new FormData();
+  fd.append("image", LIVE.blob, "scene.jpg");
+  fd.append("query", query);
+  fd.append("cat", $("#liveCat").value.trim());
+  fd.append("models", LIVE.cfg.models.map(m => m.key).join(","));
+  if (LIVE.box) fd.append("box", LIVE.box.map(v => v.toFixed(4)).join(","));
+
+  try {
+    const r = await fetch(DEMO_API.replace(/\/$/, "") + "/infer", {method: "POST", body: fd});
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) throw new Error(j.detail || `The endpoint returned ${r.status}.`);
+    showLiveResult(j);
+    const note = j.cat_generic
+      ? ' The categorical label came out as "' + j.texts.cat + '"'
+      : "";
+    liveStatus(`Done${j.queued_ms > 400 ? ", after " + (j.queued_ms / 1000).toFixed(1) + " s queueing" : ""}.`
+      + (j.cat_source === "auto" ? "." : "") + note);
+  } catch (e) {
+    liveStatus(e.message, true);
+  } finally {
+    LIVE.busy = false; $("#liveRun").disabled = false;
+  }
+}
+
+function showLiveResult(j) {
+  TRY.liveScene = {title: "Your image", domain: "live", w: j.w, h: j.h,
+                   src: URL.createObjectURL(LIVE.blob)};
+  TRY.liveQuery = {type: "your query", texts: j.texts, gt: j.gt, models: j.models};
+  TRY.mode = "live";
+  $$("#tryScenes button").forEach(b => b.setAttribute("aria-pressed", "false"));
+  $("#tryQueries").innerHTML =
+    `<button aria-pressed="true">${esc(j.texts.orig)}<span class="qt">your query · live run</span></button>`;
+  $("#tryQueries button").onclick = () => {};
+  $("#tryBack").hidden = false;
+  renderTryCards();
+  $("#tryAsked").scrollIntoView({behavior: "smooth", block: "center"});
+}
+
+function backToStored() {
+  TRY.mode = "replay";
+  $("#tryBack").hidden = true;
+  selectScene(TRY.scene);
+}
+
+loadReplay().then(setupLive);
+document.getElementById("tryBack").onclick = backToStored;
+
 segBind("#sensSort", "s", v => { sensSort = v; renderSens(); });
 segBind("#parMetric", "m", v => { parMetric = v; renderPareto(); });
 </script>
