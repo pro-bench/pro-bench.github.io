@@ -623,9 +623,7 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
 <section id="try">
   <div class="wrap">
     <h2>Try it yourself</h2>
-    <p class="lede">Pick a scene and a query, then watch what each model returns when the same target is
-      asked for three different ways. The boxes below are stored predictions from the benchmark run, not a
-      re-enactment. The walkthrough and the setup steps at the end of this section run the demo yourself.</p>
+    <p class="lede">Pick a scene and a query, then watch what each model returns when the same target is queried in three different ways. The walkthrough and the setup steps to run the benchmark on your own data are shown in the video.</p>
 
     <details class="howto" open>
       <summary>How to use this demo</summary>
@@ -726,13 +724,12 @@ footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px;justify-content:space-bet
       </div>
       <div class="runsteps">
         <h3>Run it on your own machine</h3>
-        <p>The demo loads the real model weights, so it runs locally on a CUDA GPU rather than in
-          this page.</p>
+        <p>The demo loads the real model weights, so it runs locally on a CUDA GPU.</p>
         <ol>
           <li><span><b>Get the code and the weights.</b> Clone the release and install the
-            requirements. Checkpoints download on first use.
+            requirements.
             <pre>pip install -r requirements.txt</pre></span></li>
-          <li><span><b>Start the demo server</b> against the same config the benchmark used.
+          <li><span><b>Start the demo server</b> against the pro-bench config.
             <pre>python demo_server.py \
   --config configs/benchmark.yaml \
   --keep-resident \
@@ -870,7 +867,7 @@ function renderHero() {
     box.setAttribute("stroke", f ? getComputedStyle(document.documentElement).getPropertyValue(f === "orig" ? "--d-orig" : f === "cat" ? "--d-cat" : "--d-tmpl").trim() : "#F2C200");
     note.innerHTML = f
       ? `${FL[f]} phrasing: mean mAP.5 of ${mean(f).toFixed(3)} across the 16 models, and the best choice for ${best(f)} of them.`
-      : "Three ways to ask for the same door. Bars show mean mAP.5 over all 515 Pro-Bench queries for the 16 models; select a phrasing for details.";
+      : "Three ways to query the same target (exit door). The values in each bar show mean mAP.5 over all 515 Pro-Bench queries for the 16 models; select a phrasing for details.";
   };
   $$(".ask").forEach(b => b.onclick = () => set(b.getAttribute("aria-pressed") === "true" ? null : b.dataset.f));
   set(null);
